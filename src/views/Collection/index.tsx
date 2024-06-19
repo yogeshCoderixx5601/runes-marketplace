@@ -4,17 +4,21 @@ import { fetchCollections } from "@/apiHelper/fetchCollections"; // Ensure corre
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores";
 import { FaBorderAll } from "react-icons/fa";
+import { useRouter } from "next/navigation"; // Use next/navigation
+import Link from "next/link";
 
 const CollectionInscriptionPage = () => {
   const [collectionInscription, setCollectionInscription] = useState<any[]>([]); // State to hold fetched data
   const [totalCollection, setTotalCollection] = useState("");
 
+  const router = useRouter();
+
   useEffect(() => {
     const fetchCollectionData = async () => {
       try {
         const response = await fetchCollections();
-        console.log(response,"response")
-        setCollectionInscription(response.result.result.collections); 
+        console.log(response, "response");
+        setCollectionInscription(response.result.result.collections);
         setTotalCollection(response.result.result.total);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -28,27 +32,31 @@ const CollectionInscriptionPage = () => {
     (state: RootState) => state.general.btc_price_in_dollar
   );
 
+  const handleSingleCollectionn = (slug: string) => {
+    router.push(`/collections/${slug}`);
+  };
+
   return (
     <div className="block w-full px-2">
-      <div className="flex justify-between items-center p-6 border-y-[0.5px] border-gray-400">
+      <div className="flex justify-between items-center p-6 border-y-[0.5px] light_gray">
         <div className="flex justify-center items-center text-xl">
-          <FaBorderAll />
+          {/* <FaBorderAll /> */}
           <span className="text-xl text-white font-bold pl-2">All Collections</span>
         </div>
         <div className="flex gap-4">
-          <div className="border-r border-gray-400 pr-3">
+          <div className="border-r light_gray pr-3">
             <p>Total Collections</p>
             <p className="text-white flex justify-end">{totalCollection}</p>
           </div>
-          <div className="border-r border-gray-400 pr-3">
+          <div className="border-r light_gray pr-3">
             <p>24H Vol.</p>
             <p className="text-white flex justify-end">{collectionInscription[0]?.volume_hour || "-"}</p>
           </div>
-          <div className="border-r border-gray-400 pr-3">
+          <div className="border-r light_gray pr-3">
             <p>7D Vol.</p>
             <p className="text-white flex justify-end">{collectionInscription[0]?.volume_week || "-"}</p>
           </div>
-          <div className="border-r border-gray-400 pr-3">
+          <div className="border-r light_gray pr-3">
             <p>30D Vol.</p>
             <p className="text-white flex justify-end">{collectionInscription[0]?.volume_month || "-"}</p>
           </div>
@@ -60,7 +68,7 @@ const CollectionInscriptionPage = () => {
       </div>
       <div className="w-full caption-bottom text-sm max-h-screen overflow-y-auto overflow-x-hidden no-scrollbar">
         <table className="w-full border-collapse border-accent">
-          <thead className="sticky top-0 bg-gray-800 z-10">
+          <thead className="sticky top-0 bg-dark_gray z-10">
             <tr>
               <th className="p-3 text-center">#</th>
               <th className="p-3 text-start">Name</th>
@@ -69,12 +77,16 @@ const CollectionInscriptionPage = () => {
               <th className="p-3 text-end">7D Volume</th>
               <th className="p-3 text-end">30D Volume</th>
               <th className="p-3 text-end">Owners</th>
-              <th className="p-3 text-end">Total Supply</th>
+              <th className="p-3 text-end">Supply</th>
             </tr>
           </thead>
           <tbody>
             {collectionInscription.map((item, index) => (
-              <tr key={index} className="border-b-[0.5px] border-gray-400 cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+              <tr
+                key={index}
+                className="border-b-[0.5px] border-light_gray cursor-pointer transition-colors duration-300 hover:bg-[#571343]"
+                onClick={() => handleSingleCollectionn(item.slug)}
+              >
                 <td className="p-3 text-center">{index + 1}</td>
                 <td className="p-3 flex items-center">
                   <img src={item.banner_icon || item.icon} alt="inscription icon" className="w-6 h-6 object-cover mr-2" />
