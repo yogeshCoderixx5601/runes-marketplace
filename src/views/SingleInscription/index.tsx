@@ -3,7 +3,7 @@ import { shortenString } from "@/utils";
 import copy from "copy-to-clipboard";
 import React from "react";
 import { FiCopy } from "react-icons/fi";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useWalletAddress } from "bitcoin-wallet-adapter";
 import Link from "next/link";
 const SingleInscriptionPage = ({

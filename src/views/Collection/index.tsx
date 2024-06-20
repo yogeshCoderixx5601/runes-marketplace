@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { fetchCollections } from "@/apiHelper/fetchCollections"; // Ensure correct path
+import { fetchCollections } from "@/apiHelper/fetchCollections"; 
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores";
 import { useRouter } from "next/navigation"; 
 
 const CollectionInscriptionPage = () => {
-  const [collectionInscription, setCollectionInscription] = useState<any[]>([]); // State to hold fetched data
+  const [collectionInscription, setCollectionInscription] = useState<any[]>([]); 
   const [totalCollection, setTotalCollection] = useState("");
 
   const router = useRouter();
@@ -15,9 +15,9 @@ const CollectionInscriptionPage = () => {
     const fetchCollectionData = async () => {
       try {
         const response = await fetchCollections();
-        console.log(response, "response");
-        setCollectionInscription(response.result.result.collections);
-        setTotalCollection(response.result.result.total);
+        console.log(response?.data.result.collections, "response");
+        setCollectionInscription(response?.data.result.collections);
+        setTotalCollection(response?.data.result.total);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

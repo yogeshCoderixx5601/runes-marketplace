@@ -1,15 +1,23 @@
-// "use server"
+"use server"
 import axios from 'axios';
 
-export async function fetchCollection(params: any) {
+export async function fetchCollection(params: any): Promise<{ data: any; error: string | null } | undefined>  {
   const { slug } = params;
   try {
-    const response = await axios.get(`/api/single-collection?slug=${slug}`); // Adjust the endpoint URL as per your actual API endpoint
+    let url = `${process.env.NEXT_PUBLIC_URL}/api/single-collection`;
+    const response = await axios.get(url,{
+      params:{
+        slug
+      }
+    });
     console.log('Data helper single collection:', response.data);
-    return { result: response.data }; // Ensure you return an object with `result` property
+    if (response.status === 200) {
+      return { data: response.data || [], error: null };
+    } else {
+      return undefined;
+    }
   } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error; // Rethrow the error to propagate it up
+    return undefined;
   }
 }
 

@@ -27,7 +27,7 @@ import { Popover } from "@mui/material";
 import { addNotification } from "@/stores/reducers/notificationReducer";
 import copy from "copy-to-clipboard";
 import { MdOutlineDashboard } from "react-icons/md";
-import { setBalanceData } from "@/stores/reducers/generalReducer";
+// import { setBalanceData } from "@/stores/reducers/generalReducer";
 import Search from "./Search";
 const menu = [
   {
@@ -41,15 +41,14 @@ const menu = [
   },
   {
     field: "RUNES",
-    link: "/ruunes",
+    link: "/runes",
   },
 ];
 
 const Header = () => {
-  const balanceData = useSelector(
-    (state: RootState) => state.general.balanceData
-  );
-  const [previousForm, setPreviousForm] = useState<boolean>(false);
+  // const balanceData = useSelector(
+  //   (state: RootState) => state.general.balanceData
+  // );
 
   const walletDetails = useWalletAddress();
   const pathname = usePathname();
@@ -99,11 +98,10 @@ const Header = () => {
               walletLabelClass="text-lg text-white capitalize tracking-wider"
               walletImageClass="w-[30px]"
               InnerMenu={InnerMenu}
-              balance={balanceData?.balance}
+              // balance={balanceData?.balance}
             />
           </div>
         </div>
-        {/* <Logo /> */}
       </header>
     </div>
   );
@@ -136,13 +134,7 @@ export const Face = ({ balance }: { balance: number }) => {
 export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
   const walletDetails = useWalletAddress();
   const dispatch = useDispatch();
-  const balanceData = useSelector(
-    (state: RootState) => state.general.balanceData
-  );
-
   const resetWalletDetails = () => {
-    // reseting the balance data in redux store
-    dispatch(setBalanceData(null));
 
     // clearing the localstorage
     Object.entries(localStorage).forEach(([key]) => {
@@ -165,15 +157,9 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
           horizontal: "right",
         }}
       >
-        <div className="p-6 bg-dark_violet_700 min-w-[300px] xl:min-w-[400px] max-w-[400px] relative text-white">
+        <div className="p-6 bg-customPurple_950 min-w-[300px] xl:min-w-[400px] max-w-[400px] relative text-white">
           <div className="intro flex items-center pb-6">
-            <div className="mr-2 text-3xl">
-              {balanceData ? (
-                <Face balance={balanceData.balance} />
-              ) : (
-                <FaFaceSmileWink />
-              )}
-            </div>
+           
             <p className="uppercase font-bold text-sm">
               {shortenString(walletDetails.cardinal_address, 5)}
             </p>
@@ -209,13 +195,7 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
                   </div>
                 </div>
               </div>
-              {balanceData && (
-                <div>
-                  <p className="font-bold tracking-wider text-white">
-                    {(balanceData.balance / 100_000_000).toFixed(4)} BTC
-                  </p>
-                </div>
-              )}
+            
             </div>
           </div>
           <div className="OrdinalsWallet flex items-center pb-6 w-full">
@@ -251,23 +231,9 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
               </div>
             </div>
           </div>
+        
           <div className="relative ">
-            <div className="bg-dark_violet_600 rounded cursor-pointer styled-button-wrapper my-2">
-              <button
-                className="accent_transition p-2 w-full"
-                onClick={onClose}
-              >
-                <Link href="/dashboard">
-                  <div className="center">
-                    <MdOutlineDashboard className="mr-2" />
-                    <span>Dashboard</span>
-                  </div>
-                </Link>
-              </button>
-            </div>
-          </div>
-          <div className="relative ">
-            <div className="bg-dark_violet_600 rounded cursor-pointer styled-button-wrapper my-2">
+            <div className="w-full custom-gradient rounded cursor-pointer styled-button-wrapper my-2 ">
               <button
                 className="red_transition p-2 w-full center"
                 onClick={() => {
@@ -276,30 +242,11 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
                   onClose();
                 }}
               >
-                <FaPowerOff className="mr-2" /> <span>Disconnect</span>
+                <FaPowerOff className="mr-2" /> <span className="">Disconnect</span>
               </button>
             </div>
           </div>
-          <div className="socials flex space-x-3 text-xl relative">
-            <div className="relative ">
-              <div className="bg-dark_violet_600 rounded cursor-pointer styled-button-wrapper">
-                <button className="accent_transition p-2">
-                  <Link href="https://x.com/ordinalNovus" target="_blank">
-                    <FaXTwitter />
-                  </Link>
-                </button>
-              </div>
-            </div>
-            <div className="relative ">
-              <button className="bg-dark_violet_600 rounded cursor-pointer  styled-button-wrapper">
-                <button className="accent_transition p-2">
-                  <Link href="https://discord.gg/Wuy45UfxsG" target="_blank">
-                    <FaDiscord />
-                  </Link>
-                </button>
-              </button>
-            </div>
-          </div>
+         
         </div>
       </Popover>
     );

@@ -3,14 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: {
   btc_price_in_dollar: number;
-  fees: any | null;
-  allowed_cbrcs: string[] | null;
-  balanceData: any | null;
 } = {
   btc_price_in_dollar: 0,
-  fees: null,
-  allowed_cbrcs: null,
-  balanceData: null,
 };
 
 const generalSlice = createSlice({
@@ -20,18 +14,9 @@ const generalSlice = createSlice({
     setBTCPrice: (state, action: PayloadAction<number>) => {
       state.btc_price_in_dollar = action.payload;
     },
-    setFees: (state, action: PayloadAction<any | null>) => {
-      state.fees = action.payload;
-    },
-    setAllowedCbrcs: (state, action: PayloadAction<string[] | null>) => {
-      state.allowed_cbrcs = action.payload;
-    },
-    setBalanceData: (state, action: PayloadAction<any | null>) => {
-      state.balanceData = action.payload;
-    },
   },
 });
 
-export const { setBTCPrice, setFees, setAllowedCbrcs, setBalanceData } =
+export const { setBTCPrice } =
   generalSlice.actions;
 export default generalSlice.reducer;

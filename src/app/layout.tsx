@@ -1,10 +1,8 @@
 "use client";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Provider } from "react-redux";
 import { store } from "@/stores";
 import { WalletProvider } from "bitcoin-wallet-adapter";
-import initMixpanel from "@/lib/mixpanelConfig";
 import { ReactNode, useEffect, useState } from "react";
 // import { SocketProvider } from "@/components/providers/socket";
 import Header from "@/components/Header";
@@ -20,9 +18,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useEffect(() => {
-    initMixpanel();
-  }, []);
+  
   return (
     <Provider store={store}>
       <WalletProvider>

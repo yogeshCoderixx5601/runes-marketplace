@@ -28,15 +28,13 @@ const SingleCollectionInscriptions = ({ slug }: { slug: string }) => {
     const price = await getBTCPriceInDollars();
     if (price) dispatch(setBTCPrice(price));
   }, [dispatch]);
+
   useEffect(() => {
     const fetchInscriptionsData = async () => {
       try {
         const response = await fetchSingleCollectionInscriptions({ slug });
-        // console.log(
-        //   response.result.message,
-        //   "response fetchSingleCollectionInscriptions"
-        // );
-        setCollectionInscription(response.result.result);
+      
+        setCollectionInscription(response?.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -45,7 +43,7 @@ const SingleCollectionInscriptions = ({ slug }: { slug: string }) => {
     fetchInscriptionsData();
   }, [slug]);
 
-  console.log(collectionInscription, "--------collectionInscriptions");
+  // console.log(collectionInscription, "--------collectionInscriptions");
 
   if (!collectionInscription) {
     return <div>Loading...</div>;

@@ -25,12 +25,12 @@ const SingleInscription = ({ params }: { params: { inscription_id: number } }) =
 
       const response = await fetchInscription({ inscription_id: params.inscription_id });
       console.log(response, "------response");
-      if (!response || !response.result?.result) {
+      if (!response || !response.data?.result) {
         console.log("no result");
         setError("Collection not found or error in fetching collection result");
       } else {
-        setInscription(response.result?.result);
-        console.log(response.result?.result, "collection data");
+        setInscription(response.data?.result);
+        console.log(response.data?.result, "collection data");
       }
     } catch (error) {
       console.error("Error fetching collection data", error);

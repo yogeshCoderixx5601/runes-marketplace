@@ -25,12 +25,12 @@ const SingleCollection = ({ params }: { params: { slug: string } }) => {
 
       const response = await fetchCollection({ slug: params.slug });
       console.log(response, "------response");
-      if (!response || !response.result?.result) {
+      if (!response || !response.data?.result) {
         console.log("no result");
         setError("Collection not found or error in fetching collection result");
       } else {
-        setCollection(response.result?.result);
-        console.log(response.result?.result, "collection data");
+        setCollection(response.data?.result);
+        console.log(response.data?.result, "collection data");
       }
     } catch (error) {
       console.error("Error fetching collection data", error);

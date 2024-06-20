@@ -1,25 +1,31 @@
 export interface ICollection {
-    vault: string;
-    created_at: string | number | Date;
-    updated_at: string | number | Date;
-    _id:string
-    name: string;
-    slug: string;
-    supply: number;
-    cover_icon: string;
-    banner_icon: string;
-    description: string;
-    tags: string[];
-    twitter_link?: string;
-    discord_link?: string;
-    website_link?: string;
-    no_of_phases?:number
-    launchpad_details: {
-      wallet_address:string;
-      steps_completed:number;
-      published:boolean;
-    };
-    fee_in_btc: number | null;
-    fee_address: string | null;
-    collection_link: string;
+  id?: string;
+  name?: string;
+  icon?: string;
+  banner_icon?: string | null;
+  icon_inscription?: string | null;
+  description?: string;
+  slug?: string;
+  active?: boolean;
+  sponsored_priority?: number;
+  featured_priority?: number;
+  highest_inscription_num?: number;
+  lowest_inscription_num?: number;
+  total_supply?: number;
+  socials?: Record<string, string>;
+  creator_address?: string | null;
+  floor_price?: number;
+  volume_hour?: number | null;
+  volume_six_hour?: number | null;
+  volume_day?: number | null;
+  volume_week?: number | null;
+  volume_month?: number | null;
+  volume_all_time?: number;
+  change_week?: number | null;
+  price_change_day?: number | null;
+  listed?: number;
+  owners?: number;
+  mint?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
   }
