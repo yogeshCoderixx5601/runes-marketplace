@@ -70,8 +70,8 @@ const Header = () => {
                   key={index}
                   className={
                     isActive(`${link.link}`)
-                      ? "text-[#942073]"
-                      : "hover:text-[#942073]"
+                      ? "text-customPurple_900"
+                      : "hover:text-customPurple_800"
                   }
                 >
                   <Link href={link.link}>{link.field}</Link>
@@ -91,8 +91,8 @@ const Header = () => {
               modalContentClass="bg-primary border rounded-xl border-accent overflow-hidden relative lg:p-16 md:p-12 p-6"
               buttonClassname={`text-white rounded flex items-center px-4 py-[10px] ${
                 walletDetails
-                  ? "font-bold bg-secondary  border border-dark_gray rounded-md opacity-90  walletButton"
-                  : "font-light bg-gradient-to-b from-accent to-gradient_bg_second"
+                  ? "font-bold bg-secondary  border border-dark_gray rounded-md opacity-90  custom-gradient"
+                  : "font-light custom-gradient"
               }`}
               headingClass="text-center text-white pt-2 pb-2 text-3xl capitalize font-bold mb-4"
               walletItemClass="w-full bg-accent_dark my-3 hover:border-accent border border-transparent "

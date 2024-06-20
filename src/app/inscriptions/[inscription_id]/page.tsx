@@ -1,14 +1,14 @@
 "use client";
-import { fetchCollection } from "@/apiHelper/singleCollection";
-import SingleCollectionPage from "@/views/singleCollection";
 import React, { useCallback, useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
+import SingleInscriptionPage from "@/views/SingleInscription";
+import { fetchInscription } from "@/apiHelper/fetchInscription";
 
 
-const SingleCollection = ({ params }: { params: { slug: string } }) => {
+const SingleInscription = ({ params }: { params: { inscription_id: number } }) => {
   console.log(params, "params");
   const [loading, setLoading] = useState(true);
-  const [collection, setCollection] = useState<any | null>(null);
+  const [inscription, setInscription] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -18,18 +18,18 @@ const SingleCollection = ({ params }: { params: { slug: string } }) => {
     try {
       console.log(
         {
-          slug: params.slug,
+          inscription_id: params.inscription_id,
         },
         "QUERY"
       );
 
-      const response = await fetchCollection({ slug: params.slug });
+      const response = await fetchInscription({ inscription_id: params.inscription_id });
       console.log(response, "------response");
       if (!response || !response.result?.result) {
         console.log("no result");
         setError("Collection not found or error in fetching collection result");
       } else {
-        setCollection(response.result?.result);
+        setInscription(response.result?.result);
         console.log(response.result?.result, "collection data");
       }
     } catch (error) {
@@ -41,9 +41,9 @@ const SingleCollection = ({ params }: { params: { slug: string } }) => {
   }, [params]);
 
   useEffect(() => {
-    if (params.slug) fetchData();
+    if (params.inscription_id) fetchData();
   }, [params, fetchData]);
-  // console.log(collection, "-----collection");
+  console.log(inscription, "-----inscription");
 
   if (loading) {
     return (
@@ -53,7 +53,7 @@ const SingleCollection = ({ params }: { params: { slug: string } }) => {
     );
   }
 
-  if (error || !collection) {
+  if (error || !inscription) {
     return (
       <div className="flex flex-wrap justify-center items-center h-screen bg-primary p-6">
         {error || "Collection not found or error in fetching collection data"}
@@ -63,9 +63,9 @@ const SingleCollection = ({ params }: { params: { slug: string } }) => {
 
   return (
 <div className="text-white h-screen">
-      <SingleCollectionPage collection={collection} />
+      <SingleInscriptionPage inscription={inscription} inscription_id={params.inscription_id} />
     </div>
   );
 };
 
-export default SingleCollection;
+export default SingleInscription;

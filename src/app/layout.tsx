@@ -8,7 +8,6 @@ import initMixpanel from "@/lib/mixpanelConfig";
 import { ReactNode, useEffect, useState } from "react";
 // import { SocketProvider } from "@/components/providers/socket";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 type AuthViewProps = {
   isAuthorized: boolean;
@@ -28,18 +27,14 @@ export default function RootLayout({
     <Provider store={store}>
       <WalletProvider>
         {/* <SocketProvider> */}
-          <html lang="en">
-            <body className="bg-primary text-light_gray relative ">
-              <main className=" max-w-screen-2xl mx-auto no-scrollbar relative pb-16 lg:pb-24">
-                <Header />
-
-                <div className="mt-32">{children}</div>
-              </main>
-              <div className="bg-secondary">
-                <Footer />
-              </div>
-            </body>
-          </html>
+        <html lang="en">
+          <body className="bg-primary text-light_gray relative ">
+            <main className="  no-scrollbar relative pb-16 lg:pb-24">
+              <Header />
+              <div className="pt-24">{children}</div>
+            </main>
+          </body>
+        </html>
         {/* </SocketProvider> */}
       </WalletProvider>
     </Provider>

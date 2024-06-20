@@ -7,6 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const response = await axios.get('https://turbo.ordinalswallet.com/collections');
     const result = response.data;
+    console.log(result,"result collections route")
     return NextResponse.json({result, message:"data get successfully"});
   } catch (error) {
     console.error('Error fetching data:', error);

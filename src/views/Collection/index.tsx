@@ -3,9 +3,7 @@ import React, { useState, useEffect } from "react";
 import { fetchCollections } from "@/apiHelper/fetchCollections"; // Ensure correct path
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores";
-import { FaBorderAll } from "react-icons/fa";
-import { useRouter } from "next/navigation"; // Use next/navigation
-import Link from "next/link";
+import { useRouter } from "next/navigation"; 
 
 const CollectionInscriptionPage = () => {
   const [collectionInscription, setCollectionInscription] = useState<any[]>([]); // State to hold fetched data
@@ -38,25 +36,25 @@ const CollectionInscriptionPage = () => {
 
   return (
     <div className="block w-full px-2">
-      <div className="flex justify-between items-center p-6 border-y-[0.5px] light_gray">
+      <div className="flex justify-between items-center p-6 border-y-[0.5px] border-customPurple_950">
         <div className="flex justify-center items-center text-xl">
           {/* <FaBorderAll /> */}
           <span className="text-xl text-white font-bold pl-2">All Collections</span>
         </div>
         <div className="flex gap-4">
-          <div className="border-r light_gray pr-3">
+          <div className="border-r border-customPurple_950 pr-3">
             <p>Total Collections</p>
             <p className="text-white flex justify-end">{totalCollection}</p>
           </div>
-          <div className="border-r light_gray pr-3">
+          <div className="border-r border-customPurple_950 pr-3">
             <p>24H Vol.</p>
             <p className="text-white flex justify-end">{collectionInscription[0]?.volume_hour || "-"}</p>
           </div>
-          <div className="border-r light_gray pr-3">
+          <div className="border-r border-customPurple_950 pr-3">
             <p>7D Vol.</p>
             <p className="text-white flex justify-end">{collectionInscription[0]?.volume_week || "-"}</p>
           </div>
-          <div className="border-r light_gray pr-3">
+          <div className="border-r border-customPurple_950 pr-3">
             <p>30D Vol.</p>
             <p className="text-white flex justify-end">{collectionInscription[0]?.volume_month || "-"}</p>
           </div>
@@ -84,7 +82,7 @@ const CollectionInscriptionPage = () => {
             {collectionInscription.map((item, index) => (
               <tr
                 key={index}
-                className="border-b-[0.5px] border-light_gray cursor-pointer transition-colors duration-300 hover:bg-[#571343]"
+                className="border-b-[0.5px] border-customPurple_950 cursor-pointer transition-colors duration-300 hover:bg-[#571343]"
                 onClick={() => handleSingleCollectionn(item.slug)}
               >
                 <td className="p-3 text-center">{index + 1}</td>

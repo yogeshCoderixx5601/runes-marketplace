@@ -2,8 +2,8 @@ export function shortenString(str: string, length?: number): string {
     if (str.length <= (length || 8)) {
       return str;
     }
-    const start = str.slice(0, 4);
-    const end = str.slice(-4);
+    const start = str.slice(0, 8);
+    const end = str.slice(-8);
     return `${start}...${end}`;
   }
 
@@ -20,4 +20,13 @@ export function shortenString(str: string, length?: number): string {
       console.error("Error fetching BTC price:", error);
       return null;
     }
+  }
+
+  export function convertSatoshiToBTC(satoshi:number) {
+    const SATOSHI_IN_ONE_BTC = 100000000;
+    return satoshi / SATOSHI_IN_ONE_BTC;
+  }
+  export function convertSatoshiToUSD(satoshi:number, btcPrice:number) {
+    const SATOSHI_IN_ONE_BTC = 100000000;
+    return (satoshi / SATOSHI_IN_ONE_BTC)* btcPrice;
   }

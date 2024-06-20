@@ -40,4 +40,20 @@ body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.custom-gradient {
+  @apply bg-gradient-to-b from-customPurple_900 to-customPurple_950;
+}
+
+.custom-gradient:hover {
+  @apply bg-gradient-to-b from-customPurple_800 to-customPurple_900;
+ 
+}
+.custom-gradient-border {
+  border-width: 0.5px; /* Adjust the border width as needed */
+  border-style: solid;
+  border-image: linear-gradient(to bottom, #7c1f61, #39092b) 1;
+  border-radius: 10px;
+}
+
 }
