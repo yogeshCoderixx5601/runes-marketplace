@@ -1,11 +1,11 @@
-import { IBalanceData, IFeeInfo } from "@/types";
+// import { IBalanceData, IFeeInfo } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: {
   btc_price_in_dollar: number;
-  fees: IFeeInfo | null;
+  fees: any | null;
   allowed_cbrcs: string[] | null;
-  balanceData: IBalanceData | null;
+  balanceData: any | null;
 } = {
   btc_price_in_dollar: 0,
   fees: null,
@@ -20,13 +20,13 @@ const generalSlice = createSlice({
     setBTCPrice: (state, action: PayloadAction<number>) => {
       state.btc_price_in_dollar = action.payload;
     },
-    setFees: (state, action: PayloadAction<IFeeInfo | null>) => {
+    setFees: (state, action: PayloadAction<any | null>) => {
       state.fees = action.payload;
     },
     setAllowedCbrcs: (state, action: PayloadAction<string[] | null>) => {
       state.allowed_cbrcs = action.payload;
     },
-    setBalanceData: (state, action: PayloadAction<IBalanceData | null>) => {
+    setBalanceData: (state, action: PayloadAction<any | null>) => {
       state.balanceData = action.payload;
     },
   },
