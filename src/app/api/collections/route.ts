@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     console.log(newCollections.length, "New collections to insert");
 
     if (newCollections.length > 0) {
-      await Collection.insertMany(newCollections, { ordered: false });
+      await Collection.insertMany(newCollections, { ordered: true });
       console.log("New collections inserted into DB");
     } else {
       console.log("No new collections to insert");

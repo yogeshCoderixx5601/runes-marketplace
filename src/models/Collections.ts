@@ -1,3 +1,5 @@
+import { Schema } from "mongoose";
+
 // models/Collection.js
 const mongoose = require('mongoose');
 
@@ -7,7 +9,7 @@ export const collectionSchema = new mongoose.Schema({
   name: { type: String, required: false },
   icon: { type: String, required: false },
   banner_icon: { type: String, default: null },
-  icon_inscription: { type: String, default: null },
+  icon_inscription: { type: Schema.Types.Mixed, default: null },
   description: { type: String, required: false },
   slug: { type: String, required: false },
   active: { type: Boolean, required: false },
