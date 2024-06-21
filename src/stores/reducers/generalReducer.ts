@@ -1,10 +1,11 @@
-// import { IBalanceData, IFeeInfo } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: {
   btc_price_in_dollar: number;
+  user: IUser|null;
 } = {
   btc_price_in_dollar: 0,
+  user: null
 };
 
 const generalSlice = createSlice({

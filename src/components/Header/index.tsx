@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React  from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -7,11 +7,9 @@ import {
   Notification,
   useWalletAddress,
 } from "bitcoin-wallet-adapter";
-import { getBTCPriceInDollars, shortenString } from "@/utils";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/stores";
+import { shortenString } from "@/utils";
+import { useDispatch } from "react-redux";
 import {
-  FaDiscord,
   FaFaceFrown,
   FaFaceGrinStars,
   FaFaceMeh,
@@ -19,36 +17,15 @@ import {
   FaFaceSmile,
   FaFaceSmileWink,
   FaPowerOff,
-  FaXTwitter,
 } from "react-icons/fa6";
 import { FiCopy } from "react-icons/fi";
 import { Popover } from "@mui/material";
 
 import { addNotification } from "@/stores/reducers/notificationReducer";
 import copy from "copy-to-clipboard";
-import { MdOutlineDashboard } from "react-icons/md";
-// import { setBalanceData } from "@/stores/reducers/generalReducer";
-import Search from "./Search";
-const menu = [
-  {
-    field: "All",
-    link: "/all",
-  },
-  { field: "Collections", link: "/collections" },
-  {
-    field: "BRC-20",
-    link: "/brc20",
-  },
-  {
-    field: "RUNES",
-    link: "/runes",
-  },
-];
+
 
 const Header = () => {
-  // const balanceData = useSelector(
-  //   (state: RootState) => state.general.balanceData
-  // );
 
   const walletDetails = useWalletAddress();
   const pathname = usePathname();
@@ -62,27 +39,7 @@ const Header = () => {
               AGGR
             </Link>
           </div>
-          <div className="w-4/12">
-            <ul className="flex  items-center text-sm font-normal text-white gap-10">
-              {menu.map((link, index) => (
-                <li
-                  key={index}
-                  className={
-                    isActive(`${link.link}`)
-                      ? "text-customPurple_900"
-                      : "hover:text-customPurple_800"
-                  }
-                >
-                  <Link href={link.link}>{link.field}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        
-            <div className="w-3/12">
-              <Search />
-            </div>
-
+      
           <Notification />
 
           <div className="w-2/12 btn relative inline-flex items-center lg:justify-end overflow-hidden font-medium rounded group cursor-default">
