@@ -1,5 +1,5 @@
 "use client";
-import React  from "react";
+import React, { useCallback, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -7,8 +7,8 @@ import {
   Notification,
   useWalletAddress,
 } from "bitcoin-wallet-adapter";
-import { shortenString } from "@/utils";
-import { useDispatch } from "react-redux";
+import { getBTCPriceInDollars, shortenString } from "@/utils";
+import { useDispatch, useSelector } from "react-redux";
 import {
   FaFaceFrown,
   FaFaceGrinStars,
@@ -20,14 +20,42 @@ import {
 } from "react-icons/fa6";
 import { FiCopy } from "react-icons/fi";
 import { Popover } from "@mui/material";
-
+import { setBTCPrice, setUser } from "@/stores/reducers/generalReducer";
 import { addNotification } from "@/stores/reducers/notificationReducer";
 import copy from "copy-to-clipboard";
-
+import { RootState } from "@/stores";
+import { MdOutlineDashboard } from "react-icons/md";
 
 const Header = () => {
-
+  const dispatch = useDispatch();
   const walletDetails = useWalletAddress();
+  // console.log(walletDetails,"---wallet details")
+
+  async function collectWalletDetails() {
+    if (walletDetails && walletDetails.wallet) {
+      dispatch(setUser(walletDetails));
+    } else {
+      dispatch(setUser(null));
+    }
+  }
+  useEffect(() => {
+    collectWalletDetails();
+  }, [walletDetails]);
+
+  async function getBTCPrice() {
+    const btcPrice = await getBTCPriceInDollars();
+    // console.log(btcPrice, "-----btcPrice");
+    if (btcPrice) dispatch(setBTCPrice(btcPrice));
+  }
+  useEffect(() => {
+    getBTCPrice();
+  }, []);
+
+  const BtcPrice = useSelector(
+    (state: RootState) => state.general.btc_price_in_dollar
+  );
+  console.log(BtcPrice,"=---------btcPrice")
+
   const pathname = usePathname();
   const isActive = (i: any) => i === pathname;
   return (
@@ -39,19 +67,19 @@ const Header = () => {
               AGGR
             </Link>
           </div>
-      
+        
           <Notification />
 
           <div className="w-2/12 btn relative inline-flex items-center lg:justify-end overflow-hidden font-medium rounded group cursor-default">
             <ConnectMultiButton
-              modalContentClass="bg-primary border rounded-xl border-accent overflow-hidden relative lg:p-16 md:p-12 p-6"
+              modalContentClass="bg-customPurple_950 border rounded-xl border-customPurple_950 overflow-hidden relative lg:p-16 md:p-12 p-6"
               buttonClassname={`text-white rounded flex items-center px-4 py-[10px] ${
                 walletDetails
                   ? "font-bold bg-secondary  border border-dark_gray rounded-md opacity-90  custom-gradient"
                   : "font-light custom-gradient"
               }`}
               headingClass="text-center text-white pt-2 pb-2 text-3xl capitalize font-bold mb-4"
-              walletItemClass="w-full bg-accent_dark my-3 hover:border-accent border border-transparent "
+              walletItemClass="w-full bg-customPurple_800 my-3 hover:border-customPurple_800 border border-transparent "
               walletLabelClass="text-lg text-white capitalize tracking-wider"
               walletImageClass="w-[30px]"
               InnerMenu={InnerMenu}
@@ -92,7 +120,6 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
   const walletDetails = useWalletAddress();
   const dispatch = useDispatch();
   const resetWalletDetails = () => {
-
     // clearing the localstorage
     Object.entries(localStorage).forEach(([key]) => {
       if (key.startsWith("walletBalance-")) localStorage.removeItem(key);
@@ -116,7 +143,6 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
       >
         <div className="p-6 bg-customPurple_950 min-w-[300px] xl:min-w-[400px] max-w-[400px] relative text-white">
           <div className="intro flex items-center pb-6">
-           
             <p className="uppercase font-bold text-sm">
               {shortenString(walletDetails.cardinal_address, 5)}
             </p>
@@ -152,7 +178,6 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
                   </div>
                 </div>
               </div>
-            
             </div>
           </div>
           <div className="OrdinalsWallet flex items-center pb-6 w-full">
@@ -188,22 +213,33 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
               </div>
             </div>
           </div>
-        
+          <div className="relative ">
+            <div className="w-full custom-gradient rounded cursor-pointer styled-button-wrapper my-2 ">
+              <Link href={"/dashboard"}
+                className="red_transition p-2 w-full flex justify-center items-center"
+                
+              >
+                <FaPowerOff className="mr-2" />
+                <span className="">Dashboard</span>
+              </Link>
+            </div>
+          </div>
+
           <div className="relative ">
             <div className="w-full custom-gradient rounded cursor-pointer styled-button-wrapper my-2 ">
               <button
-                className="red_transition p-2 w-full center"
+                className="red_transition p-2 w-full flex justify-center items-center"
                 onClick={() => {
                   disconnect();
                   resetWalletDetails();
                   onClose();
                 }}
               >
-                <FaPowerOff className="mr-2" /> <span className="">Disconnect</span>
+                <FaPowerOff className="mr-2" />{" "}
+                <span className="">Disconnect</span>
               </button>
             </div>
           </div>
-         
         </div>
       </Popover>
     );
