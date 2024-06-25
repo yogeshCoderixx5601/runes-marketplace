@@ -1,14 +1,18 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, models, model } from 'mongoose';
 
 // Define the Rune interface and schema
 interface IRune extends Document {
   name: string;
   amount: number;
+  divisibility:number,
+  symbol:string
 }
 
 const runeSchema = new Schema<IRune>({
   name: { type: String, required: true },
-  amount: { type: Number, required: true }
+  amount: { type: Number, required: true },
+  divisibility:{type:Number, required:true},
+  symbol:{type:String, required:true}
 }, { _id: false });
 
 // Define the Status interface and schema
@@ -44,6 +48,9 @@ const utxoSchema = new Schema<IUTXO>({
 });
 
 // Create the UTXO model
-const UtxoModel = mongoose.model<IUTXO>('Utxo', utxoSchema);
+// const UtxoModel = mongoose.model<IUTXO>('Utxo', utxoSchema);
+const UtxoModel = models.Utxo || model('Utxo', utxoSchema);
+// const User =
+//   models.User || model("User", userSchema);
 
 export default UtxoModel;

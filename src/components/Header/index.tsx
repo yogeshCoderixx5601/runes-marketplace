@@ -25,6 +25,7 @@ import { addNotification } from "@/stores/reducers/notificationReducer";
 import copy from "copy-to-clipboard";
 import { RootState } from "@/stores";
 import { MdOutlineDashboard } from "react-icons/md";
+import { addUser } from "@/apiHelper/addUserDetails";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -54,7 +55,22 @@ const Header = () => {
   const BtcPrice = useSelector(
     (state: RootState) => state.general.btc_price_in_dollar
   );
-  console.log(BtcPrice,"=---------btcPrice")
+  console.log(BtcPrice, "=---------btcPrice");
+
+  const addUserDetails = async () => {
+    try {
+      if (walletDetails && walletDetails.wallet && walletDetails.connected) {
+        const user = await addUser(walletDetails);
+        // console.log(user, "---user");
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
+  useEffect(() => {
+    addUserDetails();
+  }, [walletDetails]);
 
   const pathname = usePathname();
   const isActive = (i: any) => i === pathname;
@@ -67,7 +83,7 @@ const Header = () => {
               AGGR
             </Link>
           </div>
-        
+
           <Notification />
 
           <div className="w-2/12 btn relative inline-flex items-center lg:justify-end overflow-hidden font-medium rounded group cursor-default">
@@ -215,9 +231,9 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
           </div>
           <div className="relative ">
             <div className="w-full custom-gradient rounded cursor-pointer styled-button-wrapper my-2 ">
-              <Link href={"/dashboard"}
+              <Link
+                href={"/dashboard"}
                 className="red_transition p-2 w-full flex justify-center items-center"
-                
               >
                 <FaPowerOff className="mr-2" />
                 <span className="">Dashboard</span>

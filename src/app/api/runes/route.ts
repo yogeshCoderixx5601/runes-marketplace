@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const walletDetails = await req.json();
     console.log(walletDetails, "wallet details");
 
-    const runesUtxos = await getRunes(walletDetails.cardinal_address);
+    const runesUtxos = await getRunes(walletDetails.ordinal_address);
     // console.log(runesUtxos, "-----runesUtxos");
 
     const aggregateRuneAmount = aggregateRuneAmounts(runesUtxos);
@@ -48,10 +48,12 @@ export async function POST(req: NextRequest) {
     const transformedUtxos = runesUtxos.map(utxo => {
       const runes: IRune[] = Object.entries(utxo.rune || {}).map(([key, value]) => {
         // Explicitly type the value
-        const runeValue = value as { name: string; amount: number };
+        const runeValue = value as { name: string; amount: number,divisibility:number,symbol:string };
         return {
           name: key,
-          amount: runeValue.amount
+          amount: runeValue.amount,
+          divisibility:runeValue.divisibility,
+          symbol:runeValue.symbol
         };
       });
       const { rune, ...rest } = utxo;
