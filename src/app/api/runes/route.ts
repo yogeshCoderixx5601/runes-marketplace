@@ -1,3 +1,4 @@
+// set runes in [runes] based on the ordinal address in user collection
 import dbConnect from "@/lib/dbconnect";
 import { User } from "@/models";
 import UtxoModel from "@/models/Runes";
@@ -11,10 +12,8 @@ export async function POST(req: NextRequest) {
     console.log(walletDetails, "wallet details");
 
     const runesUtxos = await getRunes(walletDetails.ordinal_address);
-    // console.log(runesUtxos, "-----runesUtxos");
 
     const aggregateRuneAmount = aggregateRuneAmounts(runesUtxos);
-    console.log(aggregateRuneAmount,"-----aggregateRuneAmount")
 
     await dbConnect();
 
@@ -23,7 +22,7 @@ export async function POST(req: NextRequest) {
       amount: rune.amount,
     }));
 
-    const address = walletDetails.cardinal_address;
+    const address = walletDetails.ordinal_address;
 
     for (const rune of aggregateRuneAmount) {
       const query = {
@@ -38,9 +37,11 @@ export async function POST(req: NextRequest) {
       });
 
       if (result) {
-        // console.log(`Rune ${rune.name} updated successfully`);
+        // `Rune ${rune.name} already exists, no update performed`
+        console.log(`Rune updated successfully`);
       } else {
-        // console.log(`Rune ${rune.name} already exists, no update performed`);
+        console.log(`Rune ${rune.name} already exists, no update performed`);
+        // throw new Error(`Rune ${rune.name} already exists, no update performed`)
       }
     }
 
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       message: "Data received and processed successfully.",
-      runesUtxos: runesUtxos,
+      utxos: utxos,
     });
   } catch (error) {
     console.error("Error :", error);
@@ -74,8 +75,4 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// const updateRunes = await User.findOneAndUpdate(
-//   { ordinal_address: address },
-//   { $set: { runes: runes } },
-//   { new: true, useFindAndModify: false }
-// );
+

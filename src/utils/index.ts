@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export function shortenString(str: string, length?: number): string {
     if (str.length <= (length || 8)) {
       return str;
@@ -26,7 +28,10 @@ export function shortenString(str: string, length?: number): string {
     const SATOSHI_IN_ONE_BTC = 100000000;
     return satoshi / SATOSHI_IN_ONE_BTC;
   }
+  
   export function convertSatoshiToUSD(satoshi:number, btcPrice:number) {
     const SATOSHI_IN_ONE_BTC = 100000000;
     return (satoshi / SATOSHI_IN_ONE_BTC)* btcPrice;
   }
+
+

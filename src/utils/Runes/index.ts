@@ -1,5 +1,6 @@
 import { AddressTxsUtxo, IRune, RuneDetails } from "@/types";
 import axios from "axios";
+import { address } from "bitcoinjs-lib";
 
 export async function getRunes(payment_address: string) {
   let allUtxos: AddressTxsUtxo[];
@@ -13,7 +14,7 @@ export async function getRunes(payment_address: string) {
   }
 
   try {
-    runesUtxos = await selectRunesUTXOs(allUtxos);
+    runesUtxos = await selectRunesUTXOs(allUtxos,payment_address);
     return runesUtxos
   } catch (err: any) {
     throw new Error(err);
@@ -30,9 +31,9 @@ async function getUtxosByAddress(address: string): Promise<AddressTxsUtxo[]> {
   return data;
 }
 
-export async function selectRunesUTXOs(utxos: AddressTxsUtxo[]): Promise<AddressTxsUtxo[]> {
+export async function selectRunesUTXOs(utxos: AddressTxsUtxo[],payment_address: string): Promise<AddressTxsUtxo[]> {
   const selectedUtxos: any = [];
-  
+  console.log(payment_address,"---------------payment_address")
   // Sort descending by value, and filter out dummy UTXOs
   utxos = utxos.sort((a, b) => b.value - a.value);
   
@@ -40,6 +41,8 @@ export async function selectRunesUTXOs(utxos: AddressTxsUtxo[]): Promise<Address
     const rune = await doesUtxoContainRunes(utxo);
     if (rune) {
       utxo.rune = rune
+      utxo.utxo_id = `${utxo.txid}:${utxo.vout}`;
+      utxo.address = `${payment_address}`
       selectedUtxos.push(utxo);
     }
   }
@@ -95,7 +98,7 @@ export const aggregateRuneAmounts = (runesUtxos: AddressTxsUtxo[]) => {
 
   for (const runesUtxo of runesUtxos) {
     const rune = runesUtxo.rune; // Assuming runesUtxo is an AddressTxsUtxo object
-    console.log(rune,"------------ruune in utils")
+    console.log(rune,"------------rune in utils")
     const runeDetails = extractNameAndAmount(rune);
 
     for (const { name, amount } of runeDetails) {

@@ -235,7 +235,7 @@ export const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
                 href={"/dashboard"}
                 className="red_transition p-2 w-full flex justify-center items-center"
               >
-                <FaPowerOff className="mr-2" />
+                <MdOutlineDashboard className="mr-2" />
                 <span className="">Dashboard</span>
               </Link>
             </div>

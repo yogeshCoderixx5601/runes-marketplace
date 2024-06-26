@@ -1,3 +1,4 @@
+// add user details and empty [runes] 
 import dbConnect from "@/lib/dbconnect";
 import { User } from "@/models";
 import { NextRequest, NextResponse } from "next/server";

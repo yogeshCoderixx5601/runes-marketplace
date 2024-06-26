@@ -1,11 +1,7 @@
 "use client"
-import { addUser } from '@/apiHelper/addUserDetails';
 import { getRunes } from '@/apiHelper/getUserRunes';
-import { RootState } from '@/stores';
 import { useWalletAddress } from 'bitcoin-wallet-adapter';
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
 import RuneUtxos from '../RuneUtxos';
 
 interface Rune {
@@ -18,9 +14,7 @@ const DashboardPage = () => {
   const walletDetails = useWalletAddress();
   const [runes, setRunes] = useState<Rune[]>([]);
   const [expandedRuneId, setExpandedRuneId] = useState<string | null>(null);
-  const BtcPrice = useSelector(
-    (state: RootState) => state.general.btc_price_in_dollar
-  );
+
 
   const getRunesDetails = async () => {
     try {
@@ -59,16 +53,20 @@ const DashboardPage = () => {
               Amount
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Total
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className=" divide-y divide-gray-200  w-full">
+        <tbody className=" divide-y divide-customPurple_950  w-full">
           {runes.map((rune) => (
             <React.Fragment key={rune._id} >
               <tr className='p-4 bg-customPurple_900 w-full mb-10'>
                 <td className="px-6 py-4 whitespace-nowrap">{rune.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{rune.amount}</td>
+                <td className="px-6 py-4 whitespace-nowrap">total in btc and usd</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
                     onClick={() => handleRuneClick(rune)}

@@ -12,7 +12,7 @@ const runeSchema = new Schema<IRune>({
   name: { type: String, required: true },
   amount: { type: Number, required: true },
   divisibility:{type:Number, required:true},
-  symbol:{type:String, required:true}
+  symbol:{type:String, required:false}
 }, { _id: false });
 
 // Define the Status interface and schema
@@ -25,15 +25,17 @@ interface IStatus extends Document {
 
 const statusSchema = new Schema<IStatus>({
   confirmed: { type: Boolean, required: true },
-  block_height: { type: Number, required: true },
-  block_hash: { type: String, required: true },
-  block_time: { type: Number, required: true }
+  block_height: { type: Number, required: false },
+  block_hash: { type: String, required: false },
+  block_time: { type: Number, required: false }
 }, { _id: false });
 
 // Define the UTXO interface and schema
 interface IUTXO extends Document {
+  address: string;
   txid: string;
   vout: number;
+  utxo_id:string;
   status: IStatus;
   value: number;
   runes: IRune[];
@@ -42,15 +44,14 @@ interface IUTXO extends Document {
 const utxoSchema = new Schema<IUTXO>({
   txid: { type: String, required: true },
   vout: { type: Number, required: true },
+  utxo_id: { type: String, required: true },
+  address: { type: String, required: true },
   status: { type: statusSchema, required: true },
   value: { type: Number, required: true },
   runes: { type: [runeSchema], default: [] }
 });
 
-// Create the UTXO model
-// const UtxoModel = mongoose.model<IUTXO>('Utxo', utxoSchema);
+
 const UtxoModel = models.Utxo || model('Utxo', utxoSchema);
-// const User =
-//   models.User || model("User", userSchema);
 
 export default UtxoModel;
