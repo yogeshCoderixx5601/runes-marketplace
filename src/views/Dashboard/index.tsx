@@ -19,8 +19,8 @@ const DashboardPage = () => {
   const getRunesDetails = async () => {
     try {
       if (walletDetails && walletDetails.wallet && walletDetails.connected) {
-        const ordinal_address = "bc1qm045gn6vk6umsq3p7qjp0z339l9ksqyt7cwnnr";
-        const response = await getRunes(ordinal_address);
+        // const ordinal_address = "bc1qm045gn6vk6umsq3p7qjp0z339l9ksqyt7cwnnr";
+        const response = await getRunes(walletDetails.ordinal_address);
         setRunes(response?.data?.result[0].runes);
       }
     } catch (error) {

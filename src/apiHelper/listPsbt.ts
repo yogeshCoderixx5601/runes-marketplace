@@ -1,25 +1,25 @@
 "use server";
 import axios from "axios";
 
-interface UserResponse {
+interface RunesResponse {
   success: boolean;
-  message: string;
-  result: any;
+  utxo_id: string;
+  price: number;
+  receive_address: string;
+  unsigned_psbt_base64: string;
+  tap_internal_key?: string;
+  message: "Success";
 }
 
-export async function getRunes(
-  ordinal_address: string
-): Promise<{ data?: UserResponse; error: string | null } | undefined> {
+export async function listPsbt(
+  params: any
+): Promise<{ data?: RunesResponse; error: string | null } | undefined> {
   try {
-
-    // console.log(ordinal_address,"------------helper wallet")
-    let url = `${process.env.NEXT_PUBLIC_URL}/api/dashboard`;
-    const response = await axios.get(url,{
-      params:{
-        ordinal_address
-      }
-    })
-// console.log(response,"--------response helper")
+    console.log(params, "-------------params");
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_URL}/api/order/list-psbt`,
+      params
+    );
 
     if (response.status === 200) {
       return { data: response.data, error: null };

@@ -146,7 +146,7 @@ export async function POST(
     );
     // 2done
     return NextResponse.json({
-      ok: true,
+      success: true,
       utxo_id: body.utxo_id,
       price: Math.floor(body.price),
       receive_address: body.receive_address,
