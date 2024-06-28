@@ -1,12 +1,6 @@
 import mongoose, { Schema, Document, models, model } from 'mongoose';
 
-// Define the Rune interface and schema
-interface IRune extends Document {
-  name: string;
-  amount: number;
-  divisibility: number;
-  symbol: string;
-}
+
 
 const runeSchema = new Schema({
   name: { type: String, required: true },
@@ -15,13 +9,7 @@ const runeSchema = new Schema({
   symbol: { type: String, required: false },
 }, { _id: false });
 
-// Define the Status interface and schema
-interface IStatus extends Document {
-  confirmed: boolean;
-  block_height: number;
-  block_hash: string;
-  block_time: number;
-}
+
 
 const statusSchema = new Schema({
   confirmed: { type: Boolean, required: true },
@@ -31,23 +19,7 @@ const statusSchema = new Schema({
 }, { _id: false });
 
 // Define the UTXO interface and schema
-interface IUTXO extends Document {
-  address: string;
-  txid: string;
-  vout: number;
-  utxo_id: string;
-  status: IStatus;
-  value: number;
-  runes: IRune[];
-  listed: boolean;
-  listed_at: Date;
-  listed_price: number;
-  listed_price_per_token: number;
-  listed_seller_receive_address: string;
-  signed_psbt: string;
-  unsigned_psbt: string;
-  listed_maker_fee_bp: number;
-}
+
 
 const utxoSchema = new Schema({
   txid: { type: String, required: true },
@@ -86,6 +58,6 @@ const utxoSchema = new Schema({
   unsigned_psbt: { type: String },
 });
 
-const runeUtxo = models.Utxo || model<IUTXO>('Utxo', utxoSchema);
+const RuneUtxo = models.Utxo || model('Utxo', utxoSchema);
 
-export default runeUtxo;
+export default RuneUtxo;

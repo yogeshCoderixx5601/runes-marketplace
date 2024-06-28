@@ -174,36 +174,6 @@ const RuneUtxos = ({ rune }: { rune: any }) => {
       console.error("Error sending data to API endpoint:", error);
     }
   };
-
-  // const sendSignedPsbtAndListItems = async (signedPsbt: string, listItem: RunesResponse | null) => {
-  //   if (!signedPsbt || !listItem) return;
-    
-  //   const dataToSend = {
-  //     signed_listing_psbt_base64: signedPsbt,
-  //     listData: {
-  //       utxo_id: listItem.utxo_id,
-  //       receive_address: listItem.receive_address,
-  //       price: listItem.price,
-  //       unsigned_listing_psbt_base64: listItem.unsigned_psbt_base64,
-  //       tap_internal_key: listItem.tap_internal_key
-  //     }
-  //   };
-    
-  //   try {
-  //     const response = await fetch("/api/order/list-items", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(dataToSend),
-  //     });
-  
-  //     const responseData = await response.json();
-  //     console.log("Response from server:", responseData);
-  //   } catch (error) {
-  //     console.error("Error sending data to API endpoint:", error);
-  //   }
-  // };
   
   useEffect(()=>{
     sendSignedPsbtAndListItems(signPsbt, listItem);
