@@ -1,6 +1,7 @@
 // set runes in [runes] based on the ordinal address in user collection
 import dbConnect from "@/lib/dbconnect";
 import { User } from "@/models";
+import RuneUtxo from "@/models/Runes";
 import UtxoModel from "@/models/Runes";
 import { IRune } from "@/types";
 import { aggregateRuneAmounts, getRunes } from "@/utils/Runes";
@@ -45,18 +46,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
-
-    const transformedUtxos = runesUtxos.map(utxo => {
-      const runes: IRune[] = Object.entries(utxo.rune || {}).map(([key, value]) => {
-        // Explicitly type the value
-        const runeValue = value as { name: string; amount: number,divisibility:number,symbol:string };
-        return {
-          name: key,
-          amount: runeValue.amount,
-          divisibility:runeValue.divisibility,
-          symbol:runeValue.symbol
-        };
-      });
+    const transformedUtxos = runesUtxos.map((utxo) => {
+      const runes: IRune[] = Object.entries(utxo.rune || {}).map(
+        ([key, value]) => {
+          // Explicitly type the value
+          const runeValue = value as {
+            name: string;
+            amount: number;
+            divisibility: number;
+            symbol: string;
+          };
+          return {
+            name: key,
+            amount: runeValue.amount,
+            divisibility: runeValue.divisibility,
+            symbol: runeValue.symbol,
+          };
+        }
+      );
       const { rune, ...rest } = utxo;
       return { ...rest, runes };
     });
@@ -75,4 +82,32 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function GET(req: NextRequest) {
+  try {
+    const utxo_id = req.nextUrl.searchParams.get("utxo_id");
+    if (!utxo_id) {
+      return NextResponse.json(
+        { success: false, message: "Rune name is required" },
+        { status: 400 }
+      );
+    }
+    await dbConnect();
 
+    // Example query to find UTXOs for the specified runeName
+    const result = await UtxoModel.find({
+      utxo_id: utxo_id,
+    });
+
+    return NextResponse.json({
+      result,
+      success: true,
+      message: "User runes fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error in GET /api/runes:", error);
+    return NextResponse.json(
+      { success: false, message: "An error occurred" },
+      { status: 500 }
+    );
+  }
+}

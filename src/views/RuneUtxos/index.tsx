@@ -113,13 +113,13 @@ const RuneUtxos = ({ rune }: { rune: any }) => {
     inputs.push({
       address: walletDetails.cardinal_address,
       publickey: walletDetails.cardinal_pubkey,
-      sighash: 1,
+      sighash: 131,
       index: [0],
     });
 
     const options: any = {
       psbt: unsignedPsbtBase64,
-      network: "mainntnet",
+      network:process.env.NEXT_PUBLIC_NETWORK || "Mainnet",
       action: "cell",
       inputs,
     };

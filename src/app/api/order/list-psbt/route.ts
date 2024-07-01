@@ -1,11 +1,12 @@
 // app/api/order/create-listing-psbt/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { AddressTxsUtxo, IInscription } from "@/types";
+import { AddressTxsUtxo } from "@/types";
 import * as bitcoin from "bitcoinjs-lib";
 import secp256k1 from "@bitcoinerlab/secp256k1";
 import dbConnect from "@/lib/dbconnect";
 import { getSellerOrdOutputValue, getTxHexById, toXOnly } from "@/utils/MarketPlace";
 import UtxoModel from "@/models/Runes";
+import { testnet } from "bitcoinjs-lib/src/networks";
 
 bitcoin.initEccLib(secp256k1);
 
@@ -43,7 +44,8 @@ async function processrunesUtxo(
   wallet: string,
   maker_fee_bp?: number
 ) {
-  let psbt = new bitcoin.Psbt({ network: undefined });
+  // let psbt = new bitcoin.Psbt({ network: (process.env.NEXT_PUBLIC_NETWORK ?testnet: undefined) });
+  let psbt = new bitcoin.Psbt(undefined);
   await dbConnect();
 //   finding inscription *inscription_id
   const runesUtxo: AddressTxsUtxo | null = await UtxoModel.findOne({

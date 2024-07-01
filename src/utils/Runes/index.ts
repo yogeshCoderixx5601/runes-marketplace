@@ -21,7 +21,7 @@ export async function getRunes(payment_address: string) {
   }
 }
 
-async function getUtxosByAddress(address: string): Promise<AddressTxsUtxo[]> {
+export async function getUtxosByAddress(address: string): Promise<AddressTxsUtxo[]> {
   const url =
     process.env.NEXT_PUBLIC_NETWORK === "testnet"
       ? `https://mempool.space/testnet/api/address/${address}/utxo`
@@ -53,8 +53,8 @@ export async function selectRunesUTXOs(utxos: AddressTxsUtxo[],payment_address: 
 export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_NETWORK?.includes("testnet")
-      ? "https://api.testnet.ordinalnovus.com/"
-      : "https://ord.ordinalnovus.com/";
+      ? "http://64.20.33.102:56018/"
+      : `${process.env.NEXT_PUBLIC_PROVIDER}/`;
     
     if (!apiUrl) {
       console.warn("API provider URL is not defined in environment variables");

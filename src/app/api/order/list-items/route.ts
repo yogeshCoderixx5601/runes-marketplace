@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       //   console.log("adding final script witness");
 
       const psbt = addFinalScriptWitness(orderInput.signed_listing_psbt_base64);
-      if (orderInput.seller_receive_address.startsWith("bc1p")) {
+      if (orderInput.seller_receive_address.startsWith("bc1p") || orderInput.seller_receive_address.startsWith("tb1p")) {
         const validSig = verifySignature(psbt);
         if (!validSig) {
           return NextResponse.json(
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         runeUtxo.signed_psbt = psbt;
         runeUtxo.unsigned_psbt = orderInput.unsigned_listing_psbt_base64;
         runeUtxo.listed_maker_fee_bp = orderInput.maker_fee_bp || 100;
-//updating utxo collection with these details
+        //updating utxo collection with these details
         await runeUtxo.save();
         // console.log(runeUtxo, "----------rune runesData");
 
