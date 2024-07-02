@@ -1,10 +1,11 @@
 "use server";
+import { IBuyRunes } from "@/types";
 import axios from "axios";
 
 interface UserResponse {
   success: boolean;
   message: string;
-  result: any;
+  result: IBuyRunes[];
 }
 
 export async function getRuneUtxos(

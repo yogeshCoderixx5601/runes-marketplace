@@ -2,20 +2,24 @@ import { buyRunes } from "@/apiHelper/buyRunes";
 import { RootState } from "@/stores";
 import { addNotification } from "@/stores/reducers/notificationReducer";
 import { convertSatoshiToBTC, convertSatoshiToUSD } from "@/utils";
-import { useWalletAddress, useSignTx, } from "bitcoin-wallet-adapter";
+import { useWalletAddress, useSignTx } from "bitcoin-wallet-adapter";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import mixpanel from "mixpanel-browser";
 import { setNewActivity } from "@/stores/reducers/generalReducer";
+import { IBuyRunes } from "@/types";
 
-const SellRunePage = ({ runes }: { runes: any[] }) => {
+interface Props {
+  runes: IBuyRunes[];
+}
+
+const SellRunePage: React.FC<Props> = ({ runes }) => {
   const walletDetails = useWalletAddress();
   const dispatch = useDispatch();
   const router = useRouter();
   const [action, setAction] = useState<string>("");
-  const [runeData, setRuneData] = useState<any>({})
+  const [runeData, setRuneData] = useState<any>({});
   const [unsignedPsbtBase64, setUnsignedPsbtBase64] = useState<string>("");
   const [inputLength, setInputLength] = useState(0);
   const { loading: signLoading, result, error, signTx: sign } = useSignTx();
@@ -23,7 +27,7 @@ const SellRunePage = ({ runes }: { runes: any[] }) => {
   const [errorMap, setErrorMap] = useState<{ [key: string]: string | null }>(
     {}
   );
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   // const [feeRate, setFeeRate] = useState(0);
   // const [defaultFeeRate, setDefaultFeerate] = useState(0);
   const BtcPrice = useSelector(
@@ -32,31 +36,30 @@ const SellRunePage = ({ runes }: { runes: any[] }) => {
   const balanceData = useSelector(
     (state: RootState) => state.general.balanceData
   );
+// console.log(unsignedPsbtBase64,"---------------unsignedPsbtBase6467888")
+  const handleBuyRunes = async (rune: IBuyRunes) => {
+    console.log(rune, "--------------handle buy rune");
+    // if (
+    //   !walletDetails ||
+    //   !walletDetails.cardinal_address ||
+    //   !walletDetails.ordinal_address ||
+    //   !walletDetails.wallet ||
+    //   !walletDetails.cardinal_pubkey
+    // ) {
+    //   dispatch(
+    //     addNotification({
+    //       id: new Date().valueOf(),
+    //       message: "Connect wallet to continue",
+    //       open: true,
+    //       severity: "error",
+    //     })
+    //   );
+    //   return;
+    // }
 
-  const handleBuyRunes = async (rune: any) => {
-    if (
-      !walletDetails ||
-      !walletDetails.cardinal_address ||
-      !walletDetails.ordinal_address ||
-      !walletDetails.wallet ||
-      !walletDetails.cardinal_pubkey
-    ) {
-      dispatch(
-        addNotification({
-          id: new Date().valueOf(),
-          message: "Connect wallet to continue",
-          open: true,
-          severity: "error",
-        })
-      );
-      return;
-    }
-
-   
-
-    if (!balanceData) {
-      return;
-    }
+    // if (!balanceData) {
+    //   return;
+    // }
     setLoadingMap((prevLoadingMap) => ({
       ...prevLoadingMap,
       [rune._id]: true, // Set loading state for specific rune
@@ -65,9 +68,9 @@ const SellRunePage = ({ runes }: { runes: any[] }) => {
       ...prevErrorMap,
       [rune._id]: null, // Clear any previous error for specific rune
     }));
-    const runeData= rune 
-    console.log(runeData,"---------rune data")
-    setRuneData(runeData)
+    const runeData = rune;
+    console.log(runeData, "---------rune data");
+    setRuneData(runeData);
 
     try {
       const response = await buyRunes({
@@ -81,10 +84,10 @@ const SellRunePage = ({ runes }: { runes: any[] }) => {
       });
       console.log(
         response?.data?.result.unsigned_psbt_base64,
-        "----------------response"
+        "----------------response buy button"
       );
-// setRune(response?.data?.result)
-      setUnsignedPsbtBase64(response?.data?.result.unsigned_psbt_base64);
+      // setRune(response?.data?.result)
+      setUnsignedPsbtBase64(response?.data?.result.unsigned_psbt_base64 || "");
       // Handle response data if needed
     } catch (error:any) {
       console.log("error:", error);
@@ -151,7 +154,7 @@ const SellRunePage = ({ runes }: { runes: any[] }) => {
   console.log("Sign Result:", result);
 
   const broadcast = async (signedPsbt: string) => {
-    console.log(signedPsbt,"-----------------signedPsbt")
+    console.log(signedPsbt, "-----------------signedPsbt");
     try {
       const { data } = await axios.post("/api/order/broadcast", {
         signed_psbt: signedPsbt,
@@ -236,7 +239,7 @@ const SellRunePage = ({ runes }: { runes: any[] }) => {
     setLoading(false);
   }, [result, error]);
 
-  console.log(runeData,"-----------runeData")
+  console.log(runeData, "-----------runeData");
 
   return (
     <div className="w-full flex flex-wrap gap-4">

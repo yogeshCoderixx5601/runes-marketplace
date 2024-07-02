@@ -10,9 +10,17 @@ interface RunesResponse {
   tap_internal_key?: string;
   message: "Success";
 }
+export interface ListPsbt {
+  utxo_id: string ;
+  receive_address: string ;
+  price: number ;
+  wallet: any ;
+  publickey?: string ;
+}
+
 
 export async function listPsbt(
-  params: any
+  params: ListPsbt
 ): Promise<{ data?: RunesResponse; error: string | null } | undefined> {
   try {
     console.log(params, "-------------params");

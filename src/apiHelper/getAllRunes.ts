@@ -1,14 +1,15 @@
 "use server";
+import { IBuyRunes } from "@/types";
 import axios from "axios";
 
-interface UserResponse {
+interface AllRunesResponse {
   success: boolean;
   message: string;
-  result: any;
+  result: IBuyRunes[];
 }
 
 export async function getAllRune(
-): Promise<{ data?: any; error: string | null } | undefined> {
+): Promise<{ data?: AllRunesResponse; error: string | null } | undefined> {
   try {
     let url = `${process.env.NEXT_PUBLIC_URL}/api/all-runes`;
     const response = await axios.get(url);

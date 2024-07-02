@@ -1,12 +1,11 @@
 import * as bitcoin from "bitcoinjs-lib";
-import { Schema } from "mongoose";
 
 export interface IUser {
-  ordinal_address: string | null;
-  cardinal_address: string | null;
-  ordinal_pubkey: string | null;
-  cardinal_pubkey: string | null;
-  wallet: string | null;
+  ordinal_address: string ;
+  cardinal_address: string ;
+  ordinal_pubkey: string ;
+  cardinal_pubkey: string ;
+  wallet: any;
   connected?: boolean;
 }
 
@@ -36,6 +35,7 @@ export interface TxStatus {
   block_hash: string;
   block_time: number;
 }
+
 export interface UTXO {
   status: {
     block_hash: string;
@@ -48,6 +48,7 @@ export interface UTXO {
   vout: number;
   tx: bitcoin.Transaction;
 }
+
 export interface UtxoCollection {
   utxo: string;
   cardinal_address: string;
@@ -87,4 +88,41 @@ export interface IBalanceData {
   mempool_balance: number;
   mempool_txs: string[];
   dummyUtxos?: number;
+}
+
+export interface Rune {
+  name: string;
+  amount: number;
+  divisibility: number;
+  symbol: string;
+}
+
+export interface Status {
+  confirmed: boolean;
+  block_height: number;
+  block_hash: string;
+  block_time: number;
+}
+
+export interface ListedInfo {
+  listed: boolean;
+  listed_at: string;
+  listed_maker_fee_bp: number;
+  listed_price: number;
+  listed_price_per_token: number;
+  listed_seller_receive_address: string;
+}
+
+export interface IBuyRunes {
+  listed_price: number;
+  _id: string;
+  txid: string;
+  vout: number;
+  utxo_id: string;
+  address: string;
+  status: Status;
+  value: number;
+  runes: Rune[];
+  __v: number;
+  listed_info: ListedInfo;
 }

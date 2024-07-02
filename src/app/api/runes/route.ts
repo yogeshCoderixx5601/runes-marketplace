@@ -1,7 +1,7 @@
 // set runes in [runes] based on the ordinal address in user collection
 import dbConnect from "@/lib/dbconnect";
 import { User } from "@/models";
-import UtxoModel from "@/models/Runes";
+import RuneUtxo from "@/models/Runes";
 import { IRune } from "@/types";
 import { aggregateRuneAmounts, getRunes } from "@/utils/Runes";
 import { NextRequest, NextResponse } from "next/server";
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
       };
       const update = { $addToSet: { runes: rune } };
 
+      // updating user with runes
       const result = await User.findOneAndUpdate(query, update, {
         new: true,
         useFindAndModify: false,
@@ -68,13 +69,14 @@ export async function POST(req: NextRequest) {
     });
     console.log(transformedUtxos, "------transformedUtxos");
 
-
-    const utxos = await UtxoModel.create(transformedUtxos);
+// create new doc in utxoModal
+    const utxos = await RuneUtxo.create(transformedUtxos);
     console.log("Runes UTXOs saved successfully", utxos);
 
     return NextResponse.json({
+      success:true,
       message: "Data received and processed successfully.",
-      utxos: utxos,
+      // utxos: utxos,
     });
   } catch (error) {
     console.error("Error :", error);
@@ -94,7 +96,7 @@ export async function GET(req: NextRequest) {
     await dbConnect();
 
     // Example query to find UTXOs for the specified runeName
-    const result = await UtxoModel.find({
+    const result = await RuneUtxo.find({
       utxo_id: utxo_id,
     });
 

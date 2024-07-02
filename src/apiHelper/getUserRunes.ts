@@ -1,4 +1,5 @@
 "use server";
+import { IUser } from "@/types";
 import axios from "axios";
 
 interface UserResponse {

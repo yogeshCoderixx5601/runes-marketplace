@@ -7,9 +7,18 @@ interface UserResponse {
   message: string;
   result: IUser;
 }
+interface WalletDetails {
+  ordinal_address: string;
+  cardinal_address: string;
+  ordinal_pubkey: string;
+  cardinal_pubkey: string;
+  wallet: any;
+  connected: boolean;
+}
+
 
 export async function addUser(
-  walletDetails: any
+  walletDetails: WalletDetails  //change after buy done
 ): Promise<{ data?: UserResponse; error: string | null } | undefined> {
   try {
     const response = await axios.post(

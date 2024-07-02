@@ -9,7 +9,7 @@ export async function GET() {
     const result = await RuneUtxo.find({listed:true})
     .select('-signed_psbt -unsigned_psbt')
     console.log(result, "---------------result");
-    return NextResponse.json({ success: true, utxos: result });
+    return NextResponse.json({ success: true, result: result });
   } catch (error) {
     console.log(error);
     return NextResponse.json({ success: false, message: "no data found" });

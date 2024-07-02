@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         $elemMatch: { name: decodedRune },
       },
     });
-
+console.log(result,"---------result rune-utxo")
     return NextResponse.json({
       result,
       success: true,

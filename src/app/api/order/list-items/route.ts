@@ -73,7 +73,10 @@ export async function POST(req: NextRequest) {
       //   console.log("adding final script witness");
 
       const psbt = addFinalScriptWitness(orderInput.signed_listing_psbt_base64);
-      if (orderInput.seller_receive_address.startsWith("bc1p") || orderInput.seller_receive_address.startsWith("tb1p")) {
+      if (
+        orderInput.seller_receive_address.startsWith("bc1p") ||
+        orderInput.seller_receive_address.startsWith("tb1p")
+      ) {
         const validSig = verifySignature(psbt);
         if (!validSig) {
           return NextResponse.json(
@@ -87,7 +90,7 @@ export async function POST(req: NextRequest) {
           );
         }
       }
-    //   console.log("------------------------------psbt in list items:", psbt);
+      //   console.log("------------------------------psbt in list items:", psbt);
 
       const runeUtxo = await UtxoModel.findOne({
         utxo_id: orderInput.utxo_id,
@@ -96,11 +99,13 @@ export async function POST(req: NextRequest) {
       if (runeUtxo) {
         // console.log(runeUtxo.runes[0].amount / orderInput.price,"===per token")
         let listed_price_per_token = 0;
-        let totalRunes = runeUtxo.runes[0].amount / Math.pow(10, runeUtxo.runes[0].divisibility)
-        console.log(totalRunes,"-----------totalRunes")
+        let totalRunes =
+          runeUtxo.runes[0].amount /
+          Math.pow(10, runeUtxo.runes[0].divisibility);
+        console.log(totalRunes, "-----------totalRunes");
         if (runeUtxo.runes && runeUtxo.runes.length > 0) {
-            listed_price_per_token = totalRunes / orderInput.price;
-          }
+          listed_price_per_token = totalRunes / orderInput.price;
+        }
         runeUtxo.listed = true;
         runeUtxo.listed_at = new Date();
         runeUtxo.listed_price = orderInput.price;
@@ -138,9 +143,8 @@ export async function POST(req: NextRequest) {
       // use orderInput object here
       return NextResponse.json({
         ok: true,
-        utxo_id: orderInput.utxo_id,
-        price: orderInput.price,
-        message: "Success",
+        result: { utxo_id: orderInput.utxo_id, price: orderInput.price },
+        message: "list and sign utxo done",
       });
     } else {
       throw Error("Ord Provider Unavailable");

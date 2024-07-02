@@ -1,14 +1,31 @@
 "use server";
 import axios from "axios";
 
+interface OrderResponse {
+  ok: boolean;
+  utxo_id: string;
+  price: number;
+  message: string;
+}
+
 interface UserResponse {
   success: boolean;
   message: string;
-  result: any;
+  result: OrderResponse;
+}
+interface ListData {
+  seller_receive_address: string;
+  price: number;
+  utxo_id: string;
+  unsigned_listing_psbt_base64: string;
+  tap_internal_key?: string ;
+  signed_listing_psbt_base64: string;
 }
 
+
+
 export async function listItems(
-  listData: any
+  listData: ListData
 ): Promise<{ data?: UserResponse; error: string | null } | undefined> {
   try {
 

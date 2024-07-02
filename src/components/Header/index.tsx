@@ -26,6 +26,7 @@ import copy from "copy-to-clipboard";
 import { RootState } from "@/stores";
 import { MdOutlineDashboard } from "react-icons/md";
 import { addUser } from "@/apiHelper/addUserDetails";
+import { addRunes } from "@/apiHelper/addRunes";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -61,7 +62,7 @@ const Header = () => {
     try {
       if (walletDetails && walletDetails.wallet && walletDetails.connected) {
         const user = await addUser(walletDetails);
-        // console.log(user, "---user");
+        console.log(user, "---user");
       }
     } catch (error) {
       console.log(error, "error");
@@ -70,6 +71,21 @@ const Header = () => {
 
   useEffect(() => {
     addUserDetails();
+  }, [walletDetails]);
+
+  const addURunesDetails = async () => {
+    try {
+      if (walletDetails && walletDetails.wallet && walletDetails.connected) {
+        const runes = await addRunes(walletDetails);
+        console.log(runes, "---runes");
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
+  useEffect(() => {
+    addURunesDetails();
   }, [walletDetails]);
 
   const pathname = usePathname();

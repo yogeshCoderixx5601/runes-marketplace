@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { useWalletAddress, useSignTx } from "bitcoin-wallet-adapter";
 import { listPsbt } from "@/apiHelper/listPsbt";
 import { listItems } from "@/apiHelper/listItem";
+import { IBuyRunes } from "@/types";
 
 interface RunesResponse {
   success: boolean;
@@ -17,8 +18,8 @@ interface RunesResponse {
   message: "Success";
 }
 
-const RuneUtxos = ({ rune }: { rune: any }) => {
-  const [utxos, setUtxos] = useState<any[]>([]);
+const RuneUtxos = ({ rune }: { rune: string }) => {
+  const [utxos, setUtxos] = useState<IBuyRunes[]>([]);
   const [inputValues, setInputValues] = useState<{ [key: number]: number }>({});
   const [totals, setTotals] = useState<{ [key: number]: number }>({});
   const [prices, setPrices] = useState<{ [key: number]: number }>({});
@@ -34,8 +35,11 @@ const RuneUtxos = ({ rune }: { rune: any }) => {
     try {
       const encodedRune = encodeURIComponent(rune);
       const response = await getRuneUtxos(encodedRune);
-      console.log(response?.data?.result, "response");
-      setUtxos(response?.data?.result);
+      console.log(response?.data?.result, "response getRuneUtxos");
+     const utxos = response?.data?.result
+     if(utxos){
+      setUtxos(utxos);
+     }
     } catch (error) {
       console.log("Error fetching rune UTXOs:", error);
     }
@@ -81,7 +85,7 @@ const RuneUtxos = ({ rune }: { rune: any }) => {
     setTotals((prev) => ({ ...prev, [utxoIndex]: totalValue }));
   };
 
-  const listPsbtData = async (utxo: any, utxoIndex: number) => {
+  const listPsbtData = async (utxo: IBuyRunes, utxoIndex: number) => {
     const details = {
       utxo_id: utxo?.utxo_id,
       receive_address: utxo?.address,
@@ -186,7 +190,7 @@ const RuneUtxos = ({ rune }: { rune: any }) => {
           key={utxoIndex}
           className="w-full border-b-2 py-4 flex flex-wrap items-center justify-between bg-white p-4 rounded-lg shadow-md"
         >
-          {utxo.runes?.map((rune: any, runeIndex: any) => (
+          {utxo.runes?.map((rune, runeIndex: number) => (
             <div key={runeIndex} className="w-1/4 flex flex-col items-start">
               <p className="text-sm font-semibold text-gray-700">Rune Name</p>
               <p className="text-lg text-left text-gray-900">{rune.name}</p>

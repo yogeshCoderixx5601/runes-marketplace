@@ -1,19 +1,19 @@
 "use server";
 import axios from "axios";
 
-// interface BuyRunesResponse {
-//   ok: boolean;
-//   unsigned_psbt_base64: string;
-//   input_length: number;
-//   utxo_id: string;
-//   receive_address: string;
-//   pay_address: string;
-//   for: string;
-// }
+interface IResult {
+  unsigned_psbt_base64: string;
+  input_length: number;
+  utxo_id: string;
+  receive_address: string;
+  pay_address: string;
+  for: string; // Assuming 'for' is a string, adjust if it's a different type
+}
+
 
 interface BuyRunesResponse {
   ok: boolean;
-  result: any;
+  result: IResult;
 }
 
 interface BuyRunesParams {

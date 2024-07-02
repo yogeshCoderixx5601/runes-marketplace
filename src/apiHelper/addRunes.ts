@@ -5,7 +5,6 @@ import axios from "axios";
 interface RunesResponse {
   success: boolean;
   message: string;
-  result: any;
 }
 
 export async function addRunes(
