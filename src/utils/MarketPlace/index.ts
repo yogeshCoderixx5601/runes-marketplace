@@ -112,22 +112,29 @@ export async function mapUtxos(utxosFromMempool: any[]): Promise<UTXO[]> {
   return ret;
 }
 
-export async function fetchLatestRuneData(
-  utxo_id: string
-): Promise<any> {
-  const url = `${process.env.NEXT_PUBLIC_URL}/api/runes`;
-// console.log("**************insde fetch rune market place")
+export async function fetchLatestUtxoData(utxo_id: string): Promise<any> {
+  const url = `${process.env.NEXT_PUBLIC_PROVIDER}/output/${utxo_id}`;
+  console.log("**************url:", url);
   try {
-    console.log("------------before response")
+    console.log("------------before response");
     const response = await axios.get(url, {
-      params: {
-        utxo_id,
+      headers: {
+        Accept: "application/json",
       },
     });
-    // console.log(response,"------------response")
+    console.log(response, "------------response");
     const data = response.data;
     return data;
-  } catch (error: any) {
+  } catch (error:any) {
     throw new Error(`Failed to fetch data: ${error.response.data}`);
   }
 }
+
+export const fromXOnly = (buffer: Buffer): string => {
+  // Check if buffer has a length of 32, which means it was not sliced
+  if (buffer.length === 32) {
+    return buffer.toString("hex");
+  } else {
+    throw Error("Wrong pubkey");
+  }
+};

@@ -82,3 +82,9 @@ export interface IListingState {
     mergedSignedBuyingPSBTBase64?: string;
   };
 }
+export interface IBalanceData {
+  balance: number;
+  mempool_balance: number;
+  mempool_txs: string[];
+  dummyUtxos?: number;
+}

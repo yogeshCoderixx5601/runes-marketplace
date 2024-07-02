@@ -5,6 +5,7 @@ import { doesUtxoContainRunes, getUtxosByAddress } from "@/utils/Runes";
 import { getSellerOrdOutputValue, getTxHexById, mapUtxos, toXOnly } from "..";
 import { convertSatoshiToBTC, satsToDollars } from "@/utils";
 import calculateTxFee from "@/utils/api/calculateTxFee";
+import { testnet } from "bitcoinjs-lib/src/networks";
 
 export const DUMMY_UTXO_MIN_VALUE = Number(580);
 export const DUMMY_UTXO_VALUE = 1000;
@@ -34,46 +35,45 @@ export async function buyOrdinalPSBT(
   let dummyUtxos: UTXO[] | null;
   let paymentUtxos: AddressTxsUtxo[] | undefined;
 
+  //  console.log(first)
   try {
     payerUtxos = await getUtxosByAddress(payerAddress);
+    console.log(payerUtxos, "---------payerUtxos");
   } catch (e) {
     console.error(e);
     return Promise.reject("Mempool error");
   }
 
-  dummyUtxos = await selectDummyUTXOs(payerUtxos);
+  // dummyUtxos = await selectDummyUTXOs(payerUtxos);
   let minimumValueRequired: number;
   let vins: number;
   let vouts: number;
 
-  if (!dummyUtxos || dummyUtxos.length < 2) {
-    console.log("Lacking dummy utxos");
-    minimumValueRequired = numberOfDummyUtxosToCreate * DUMMY_UTXO_VALUE;
-    vins = 0;
-    vouts = numberOfDummyUtxosToCreate;
-  } else {
-    minimumValueRequired =
-      price + numberOfDummyUtxosToCreate * DUMMY_UTXO_VALUE;
-    vins = 3;
-    vouts = 4 + numberOfDummyUtxosToCreate;
+  // if (!dummyUtxos || dummyUtxos.length < 2) {
+  //   console.log("Lacking dummy utxos");
+  //   minimumValueRequired = numberOfDummyUtxosToCreate * DUMMY_UTXO_VALUE;
+  //   vins = 0;
+  //   vouts = numberOfDummyUtxosToCreate;
+  // } else
 
-    // add fee to minimumValueRequired
+  minimumValueRequired = price + numberOfDummyUtxosToCreate * DUMMY_UTXO_VALUE;
+  vins = 3;
+  vouts = 4 + numberOfDummyUtxosToCreate;
 
-    let platformFeeValue = Math.floor(
-      (minimumValueRequired * (0 + 100)) / 10000
-    );
-    // Assuming minimumValueRequired is in satoshis
-    platformFeeValue = Math.max(Math.round(minimumValueRequired * 0.01), 4000);
+  // add fee to minimumValueRequired
 
-    minimumValueRequired = minimumValueRequired + platformFeeValue;
+  let platformFeeValue = Math.floor((minimumValueRequired * (0 + 100)) / 10000);
+  // Assuming minimumValueRequired is in satoshis
+  platformFeeValue = Math.max(Math.round(minimumValueRequired * 0.01), 4000);
 
-    console.log({ minimumValueRequired });
-  }
+  minimumValueRequired = minimumValueRequired + platformFeeValue;
+
+  console.log({ minimumValueRequired });
 
   try {
     const taprootAddress =
       receiverAddress.startsWith("bc1p") || receiverAddress.startsWith("tb1p");
-    paymentUtxos = await selectPaymentUTXOs(
+    paymentUtxos = await selectPaymentUtxos(
       payerUtxos,
       minimumValueRequired,
       vins,
@@ -81,16 +81,17 @@ export async function buyOrdinalPSBT(
       fee_rate,
       taprootAddress
     );
+    console.log(paymentUtxos, "-----------rune utxos");
 
     let psbt: any = null;
 
     if (
-      dummyUtxos &&
-      dummyUtxos.length >= 2 &&
+      // dummyUtxos &&
+      // dummyUtxos.length >= 2 &&
       runes.address &&
       runes.listed_price &&
       runes.listed_seller_receive_address &&
-      runes.output_value
+      runes.value
     ) {
       const listing = {
         seller: {
@@ -109,7 +110,7 @@ export async function buyOrdinalPSBT(
           fee_rate,
           buyerPublicKey: publickey,
           unsignedBuyingPSBTBase64: "",
-          buyerDummyUTXOs: dummyUtxos,
+          buyerDummyUTXOs: [],
           buyerPaymentUTXOs: paymentUtxos,
         },
       };
@@ -136,7 +137,7 @@ export async function buyOrdinalPSBT(
           paymentUtxos,
           payerAddress,
           numberOfDummyUtxosToCreate,
-          dummyUtxos,
+          dummyUtxos: [],
           psbt,
           for: "dummy",
         },
@@ -173,7 +174,7 @@ async function selectDummyUTXOs(
   return result;
 }
 
-export async function selectPaymentUTXOs(
+export async function selectPaymentUtxos(
   utxos: AddressTxsUtxo[],
   amount: number, // amount is expected total output (except tx fee)
   vinsLength: number,
@@ -189,12 +190,18 @@ export async function selectPaymentUTXOs(
     .filter((x) => x.value > DUMMY_UTXO_VALUE)
     .sort((a, b) => b.value - a.value);
 
+  console.log({ utxos }, "FINAL");
+
   for (const utxo of utxos) {
     // Never spend a utxo that contains an inscription for cardinal purposes
+
     if (await doesUtxoContainRunes(utxo)) {
+      console.log("Rune Present in: ", utxo.txid, utxo.vout);
       continue;
     }
+    console.log({ utxo });
     selectedUtxos.push(utxo);
+    console.log(selectedUtxos, "---------------selectedUtxos");
     selectedAmount += utxo.value;
 
     if (
@@ -214,27 +221,35 @@ export async function selectPaymentUTXOs(
       break;
     }
   }
-
+  console.log(selectedAmount, "----selected amount");
   if (selectedAmount < amount) {
+    console.log(selectedAmount, "----selected amount");
     throw `Your wallet needs ${Number(
       await satsToDollars(amount - selectedAmount)
     ).toFixed(2)} USD more`;
   }
 
+  console.log({ selectedUtxos });
   return selectedUtxos;
 }
-async function generateUnsignedBuyingPSBTBase64(
-  listing: IListingState,
-  wallet: string
-) {
+async function generateUnsignedBuyingPSBTBase64(listing: any, wallet: string) {
   wallet = wallet.toLowerCase();
-  const psbt = new bitcoin.Psbt({ network: undefined });
-
+  const psbt = new bitcoin.Psbt({
+    network:
+      process.env.NEXT_PUBLIC_NETWORK === "testnet" ? testnet : undefined,
+  });
   const collection = listing.seller.ordItem.official_collection;
-
-  const taprootAddress = listing?.buyer?.buyerAddress.startsWith("bc1p");
-  const segwitAddress = listing?.buyer?.buyerAddress.startsWith("bc1q");
+  const taprootAddress =
+    listing?.buyer?.buyerAddress.startsWith("bc1p") ||
+    listing?.buyer?.buyerAddress.startsWith("tb1p");
+  const segwitAddress =
+    listing?.buyer?.buyerAddress.startsWith("bc1q") ||
+    listing?.buyer?.buyerAddress.startsWith("tb1q");
   const buyerPublicKey = listing?.buyer?.buyerPublicKey;
+
+  // const taprootAddress = listing?.buyer?.buyerAddress.startsWith("bc1p");
+  // const segwitAddress = listing?.buyer?.buyerAddress.startsWith("bc1q");
+  // const buyerPublicKey = listing?.buyer?.buyerPublicKey;
   if (
     !listing.buyer ||
     !listing.buyer.buyerAddress ||
@@ -242,76 +257,13 @@ async function generateUnsignedBuyingPSBTBase64(
   ) {
     throw new Error("Buyer address is not set");
   }
-  if (!listing.seller.ordItem.output_value) {
+  if (!listing.seller.ordItem.value) {
     throw Error("Inscription has no output value");
-  }
-
-  if (
-    listing.buyer.buyerDummyUTXOs?.length !== 2 ||
-    !listing.buyer.buyerPaymentUTXOs
-  ) {
-    throw new Error("Buyer address has not enough utxos");
   }
 
   let totalInput = 0;
 
-  // Add two dummyUtxos
-  for (const dummyUtxo of listing.buyer.buyerDummyUTXOs) {
-    const tx = bitcoin.Transaction.fromHex(await getTxHexById(dummyUtxo.txid));
-    for (const output in tx.outs) {
-      try {
-        tx.setWitness(parseInt(output), []);
-      } catch {}
-    }
-    const input: any = {
-      hash: dummyUtxo.txid,
-      index: dummyUtxo.vout,
-      ...(taprootAddress && {
-        nonWitnessUtxo: tx.toBuffer(),
-      }),
-    };
-
-    if (!taprootAddress) {
-      const redeemScript = bitcoin.payments.p2wpkh({
-        pubkey: Buffer.from(buyerPublicKey!, "hex"),
-      }).output;
-      const p2sh = bitcoin.payments.p2sh({
-        redeem: { output: redeemScript },
-      });
-
-      if (wallet !== "unisat") {
-        input.witnessUtxo = tx.outs[dummyUtxo.vout];
-        // input.witnessUtxo = {
-        //   script: p2sh.output,
-        //   value: dummyUtxo.value,
-        // } as WitnessUtxo;
-        if (!segwitAddress && (wallet === "xverse" || wallet === "magiceden"))
-          input.redeemScript = p2sh.redeem?.output;
-      } else {
-        // unisat wallet should not have redeemscript for buy tx
-        input.witnessUtxo = tx.outs[dummyUtxo.vout];
-      }
-    } else {
-      // unisat
-      input.witnessUtxo = tx.outs[dummyUtxo.vout];
-      input.tapInternalKey = toXOnly(
-        tx.toBuffer().constructor(buyerPublicKey, "hex")
-      );
-    }
-
-    psbt.addInput(input);
-    totalInput += dummyUtxo.value;
-  }
-
-  // Add dummy output
-  psbt.addOutput({
-    address: listing.buyer.buyerAddress,
-    value:
-      listing.buyer.buyerDummyUTXOs[0].value +
-      listing.buyer.buyerDummyUTXOs[1].value,
-    //+
-    // listing.seller.ordItem.output_value,
-  });
+ 
   // Add ordinal output
   psbt.addOutput({
     address: listing.buyer.buyerTokenReceiveAddress,
@@ -324,10 +276,15 @@ async function generateUnsignedBuyingPSBTBase64(
   psbt.addOutput(sellerOutput);
 
   // Add payment utxo inputs
+  console.log(listing.buyer, " buyer payment utxos");
   for (const utxo of listing.buyer.buyerPaymentUTXOs) {
     const tx = bitcoin.Transaction.fromHex(await getTxHexById(utxo.txid));
+    console.log(tx, "-------------tx");
+
+    // Loop through outputs of the transaction
     for (const output in tx.outs) {
       try {
+        // Attempt to set an empty witness for each output
         tx.setWitness(parseInt(output), []);
       } catch {}
     }
@@ -335,86 +292,48 @@ async function generateUnsignedBuyingPSBTBase64(
     const input: any = {
       hash: utxo.txid,
       index: utxo.vout,
+      // Include non-witness UTXO if taprootAddress is defined
       ...(taprootAddress && {
         nonWitnessUtxo: tx.toBuffer(),
       }),
     };
 
     if (!taprootAddress) {
+      // Construct redeem script for P2WPKH (pay-to-witness-public-key-hash)
       const redeemScript = bitcoin.payments.p2wpkh({
         pubkey: Buffer.from(listing.buyer.buyerPublicKey!, "hex"),
       }).output;
+
+      // Create P2SH (pay-to-script-hash) from redeem script
       const p2sh = bitcoin.payments.p2sh({
         redeem: { output: redeemScript },
       });
 
+      // Handle different wallets
       if (wallet !== "unisat") {
         input.witnessUtxo = tx.outs[utxo.vout];
-        // input.witnessUtxo = {
-        //   script: p2sh.output,
-        //   value: utxo.value,
-        // } as WitnessUtxo;
-        if (!segwitAddress && (wallet === "xverse" || wallet === "magiceden"))
+        // Set redeem script for specific wallets
+        if (!segwitAddress && (wallet === "xverse" || wallet === "magiceden")) {
           input.redeemScript = p2sh.redeem?.output;
+        }
       } else {
-        // unisat wallet should not have redeemscript for buy tx
+        // Handle unisat wallet inputs
         input.witnessUtxo = tx.outs[utxo.vout];
       }
     } else {
+      // Handle taproot address case
       input.witnessUtxo = tx.outs[utxo.vout];
       input.tapInternalKey = toXOnly(
         tx.toBuffer().constructor(listing.buyer.buyerPublicKey, "hex")
       );
     }
 
+    // Add input to PSBT
     psbt.addInput(input);
 
+    // Accumulate total input value
     totalInput += utxo.value;
   }
-
-  // Create a platform fee output
-  let platformFeeValue = Math.floor((listing.seller.price * (0 + 100)) / 10000);
-  // Assuming listing.seller.price is in satoshis
-  platformFeeValue = Math.max(Math.round(listing.seller.price * 0.01), 4000);
-
-  // platformFeeValue > DUMMY_UTXO_MIN_VALUE ? platformFeeValue : 580;
-
-  console.log(platformFeeValue, "PLATFORM_FEE");
-  if (platformFeeValue > 0) {
-    psbt.addOutput({
-      address: PLATFORM_FEE_ADDRESS,
-      value: platformFeeValue,
-    });
-  }
-
-  if (collection && collection?.royalty_address && collection?.royalty_bp) {
-    const bp = collection.royalty_bp; // 300 represents 3% (since 100 basis points = 1%)
-
-    // Calculate the royalty value based on the basis points
-    let royaltyValue = Math.round((listing.seller.price * bp) / 10000);
-
-    // Ensure the minimum royalty value is 2000 if the calculated value is less
-    royaltyValue = Math.max(royaltyValue, 2000);
-
-    console.log(royaltyValue, "ROYALTY_FEE");
-
-    if (royaltyValue > 0) {
-      psbt.addOutput({
-        address: collection.royalty_address,
-        value: royaltyValue,
-      });
-    }
-  }
-
-  // Create two new dummy utxo output for the next purchase
-  psbt.addOutput({
-    address: listing.buyer.buyerAddress,
-    value: DUMMY_UTXO_VALUE,
-  });
-  psbt.addOutput({
-    address: listing.buyer.buyerAddress,
-    value: DUMMY_UTXO_VALUE,
-  });
 
   const fee = calculateTxFee(
     psbt.txInputs.length,
@@ -445,7 +364,7 @@ Missing:    ${convertSatoshiToBTC(-changeValue)} BTC`;
   if (changeValue > DUMMY_UTXO_MIN_VALUE) {
     psbt.addOutput({
       address: listing.buyer.buyerAddress,
-      value: changeValue + listing.seller.ordItem.output_value,
+      value: changeValue + listing.seller.ordItem.value,
     });
   }
 
@@ -457,14 +376,14 @@ Missing:    ${convertSatoshiToBTC(-changeValue)} BTC`;
   return listing;
 }
 
-async function getSellerInputAndOutput(listing: IListingState) {
-  if (!listing.seller.ordItem.output) {
-    throw Error("Inscription has no output");
+async function getSellerInputAndOutput(listing: any) {
+  if (!listing.seller.ordItem.utxo_id) {
+    throw Error("runes has no utxo id");
   }
   const [
     ordinalUtxoTxId,
     ordinalUtxoVout,
-  ] = listing.seller.ordItem.output.split(":");
+  ] = listing.seller.ordItem.utxo_id.split(":");
   const tx = bitcoin.Transaction.fromHex(await getTxHexById(ordinalUtxoTxId));
   // No need to add this witness if the seller is using taproot
   if (!listing.seller.tapInternalKey) {
@@ -489,7 +408,7 @@ async function getSellerInputAndOutput(listing: IListingState) {
     );
     console.log(sellerInput.tapInternalKey.toString("hex"), "tik");
   }
-  if (!listing.seller.ordItem.output_value) {
+  if (!listing.seller.ordItem.value) {
     throw Error("Inscription has no output value");
   }
 
@@ -500,7 +419,7 @@ async function getSellerInputAndOutput(listing: IListingState) {
       value: getSellerOrdOutputValue(
         listing.seller.price,
         listing.seller.makerFeeBp,
-        listing.seller.ordItem.output_value
+        listing.seller.ordItem.value
       ),
     },
   };

@@ -1,6 +1,5 @@
 "use client";
 import { getAllRune } from "@/apiHelper/getAllRunes";
-import { getRuneUtxos } from "@/apiHelper/getRuneUtxos";
 import SellRunePage from "@/views/HomePage/SellRunes";
 import { useEffect, useState } from "react";
 

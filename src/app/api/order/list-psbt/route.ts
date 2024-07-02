@@ -44,8 +44,8 @@ async function processrunesUtxo(
   wallet: string,
   maker_fee_bp?: number
 ) {
-  // let psbt = new bitcoin.Psbt({ network: (process.env.NEXT_PUBLIC_NETWORK ?testnet: undefined) });
-  let psbt = new bitcoin.Psbt(undefined);
+  let psbt = new bitcoin.Psbt({ network: (process.env.NEXT_PUBLIC_NETWORK ?testnet: undefined) });
+  // let psbt = new bitcoin.Psbt(undefined);
   await dbConnect();
 //   finding inscription *inscription_id
   const runesUtxo: AddressTxsUtxo | null = await UtxoModel.findOne({

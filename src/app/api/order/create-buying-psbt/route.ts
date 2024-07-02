@@ -1,7 +1,7 @@
 // pages/api/v1/order/createBuyPsbt.ts
 import dbConnect from "@/lib/dbconnect";
 import RuneUtxo from "@/models/Runes";
-import { fetchLatestRuneData } from "@/utils/MarketPlace";
+import {  fetchLatestUtxoData } from "@/utils/MarketPlace";
 import { buyOrdinalPSBT } from "@/utils/MarketPlace/buying";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -50,8 +50,8 @@ async function processOrdItem(
   fee_rate: number,
   expected_price: number
 ) {
-  const ordItem: any = await fetchLatestRuneData(utxo_id);
-  console.log(ordItem.result[0].address,"---order items")
+  const ordItem: any = await fetchLatestUtxoData(utxo_id);
+  console.log(ordItem,"---order items")
   await dbConnect();
   const dbItem: any | null = await RuneUtxo.findOne({
     utxo_id,
@@ -65,15 +65,15 @@ async function processOrdItem(
     throw Error("Item not listed in db");
   }
   if (
-    (ordItem && ordItem.result[0].address && ordItem.result[0].address !== dbItem.address) ||
+    (ordItem && ordItem.address && ordItem.address !== dbItem.address) ||
     dbItem.output !== ordItem.output
   ) {
 
     dbItem.listed = false;
     dbItem.listed_price = 0;
-    dbItem.address = ordItem.ordItem.result[0].address;
-    dbItem.output = ordItem.result[0].output;
-    dbItem.value = ordItem.result[0].value;
+    dbItem.address = ordItem.address;
+    dbItem.output = ordItem.output;
+    dbItem.value = ordItem.value;
     dbItem.in_mempool = false;
     dbItem.signed_psbt = "";
     dbItem.unsigned_psbt = "";
@@ -85,11 +85,11 @@ async function processOrdItem(
     throw Error("Item Price has been updated. Refresh Page.");
   }
   if (
-    ordItem.result[0].address &&
+    ordItem.address &&
     dbItem.signed_psbt  &&
     dbItem.listed_price &&
-    ordItem.result[0].utxo_id &&
-    ordItem.result[0].value
+    // ordItem.utxo_id &&
+    ordItem.value
   ) {
     const result = await buyOrdinalPSBT(
       pay_address,
@@ -123,7 +123,8 @@ export async function POST(
   console.log("***** CREATE UNSIGNED BUY PSBT API CALLED *****");
 
   try {
-    const body: OrderInput = await req.json();
+    const body: any = await req.json();
+    console.log(body)
     const missingFields = validateRequest(body);
 
     if (missingFields.length > 0) {
@@ -154,17 +155,16 @@ export async function POST(
 
     return NextResponse.json({
       ok: true,
-      unsigned_psbt_base64: psbt,
+     result:{ unsigned_psbt_base64: psbt,
       input_length:
         result.data.for === "dummy"
           ? 1
           : result.data.psbt.buyer.unsignedBuyingPSBTInputSize,
       // ...result,
-      inscription_id: body.utxo_id,
+      utxo_id: body.utxo_id,
       receive_address: body.receive_address,
       pay_address: body.pay_address,
-      for: result.data.for,
-      message: "Success",
+      for: result.data.for,}
     });
   
   

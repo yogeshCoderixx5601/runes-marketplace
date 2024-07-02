@@ -1,6 +1,6 @@
 import { AddressTxsUtxo, IRune, RuneDetails } from "@/types";
 import axios from "axios";
-import { address } from "bitcoinjs-lib";
+// import { address } from "bitcoinjs-lib";
 
 export async function getRunes(payment_address: string) {
   let allUtxos: AddressTxsUtxo[];
@@ -53,7 +53,7 @@ export async function selectRunesUTXOs(utxos: AddressTxsUtxo[],payment_address: 
 export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_NETWORK?.includes("testnet")
-      ? "http://64.20.33.102:56018/"
+      ? "http://192.168.1.17:8080/"
       : `${process.env.NEXT_PUBLIC_PROVIDER}/`;
     
     if (!apiUrl) {
@@ -68,14 +68,17 @@ export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
       },
     });
     
-    if (response.data.runes) {
-      return response.data.runes 
+    console.log(typeof response.data)
+    if (Array.isArray(response.data.runes) && response.data.runes.length > 0) {
+      console.log("Runes data found:", response.data.runes);
+      return response.data.runes;
     } else {
-      return undefined;
+      console.log("No runes data found or it is empty.");
+      return false;
     }
   } catch (error) {
     console.error("Error in doesUtxoContainRunes:", error);
-    return undefined;
+    return true;
   }
 }
 

@@ -120,7 +120,7 @@ const RuneUtxos = ({ rune }: { rune: any }) => {
     const options: any = {
       psbt: unsignedPsbtBase64,
       network:process.env.NEXT_PUBLIC_NETWORK || "Mainnet",
-      action: "cell",
+      action: "sell",
       inputs,
     };
     // console.log(options, "OPTIONS");

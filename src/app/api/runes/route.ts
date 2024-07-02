@@ -1,7 +1,6 @@
 // set runes in [runes] based on the ordinal address in user collection
 import dbConnect from "@/lib/dbconnect";
 import { User } from "@/models";
-import RuneUtxo from "@/models/Runes";
 import UtxoModel from "@/models/Runes";
 import { IRune } from "@/types";
 import { aggregateRuneAmounts, getRunes } from "@/utils/Runes";
@@ -25,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const address = walletDetails.ordinal_address;
 
-    for (const rune of aggregateRuneAmount) {
+    for (const rune of runes) {
       const query = {
         ordinal_address: address,
         "runes.name": { $ne: rune.name },
@@ -68,6 +67,7 @@ export async function POST(req: NextRequest) {
       return { ...rest, runes };
     });
     console.log(transformedUtxos, "------transformedUtxos");
+
 
     const utxos = await UtxoModel.create(transformedUtxos);
     console.log("Runes UTXOs saved successfully", utxos);
