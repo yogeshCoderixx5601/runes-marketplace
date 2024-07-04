@@ -1,7 +1,7 @@
 "use client";
 import { getAllRune } from "@/apiHelper/getAllRunes";
 import { IBuyRunes } from "@/types";
-import SellRunePage from "@/views/HomePage/SellRunes";
+import SellRunePage from "@/views/HomePage/BuyRunes";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -9,10 +9,10 @@ export default function Home() {
   const Runesutxo = async () => {
     try {
       const response = await getAllRune();
-      console.log(response?.data?.result, "-----------------response");
+      // console.log(response?.data?.result, "-----------------response");
       const runes = response?.data?.result;
       if (runes) {
-        console.log(runes, "-----------------response");
+        // console.log(runes, "-----------------response");
         setRunes(runes); // Update state only if runes is defined
       } else {
         console.log("No data received from API");

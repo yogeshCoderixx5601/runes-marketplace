@@ -13,7 +13,7 @@ const ORDINALS_POSTAGE_VALUE = Number(1000);
 export const PLATFORM_FEE_ADDRESS =
   process.env.PLATFORM_FEE_ADDRESS ||
   "bc1qz9fuxrcrta2ut0ad76zlse09e98x9wrr7su7u6";
-const BUYING_PSBT_SELLER_SIGNATURE_INDEX = 2;
+const BUYING_PSBT_SELLER_SIGNATURE_INDEX = 1;
 
 interface Result {
   status: string;
@@ -35,12 +35,12 @@ export async function buyOrdinalPSBT(
   let dummyUtxos: UTXO[] | null;
   let paymentUtxos: AddressTxsUtxo[] | undefined;
 
-  //  console.log(first)
+   console.log({payerAddress})
   try {
     payerUtxos = await getUtxosByAddress(payerAddress);
     console.log(payerUtxos, "---------payerUtxos");
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return Promise.reject("Mempool error");
   }
 
@@ -263,6 +263,9 @@ async function generateUnsignedBuyingPSBTBase64(listing: any, wallet: string) {
 
   let totalInput = 0;
 
+
+  const { sellerInput, sellerOutput } = await getSellerInputAndOutput(listing);
+
  
   // Add ordinal output
   psbt.addOutput({
@@ -270,10 +273,6 @@ async function generateUnsignedBuyingPSBTBase64(listing: any, wallet: string) {
     value: ORDINALS_POSTAGE_VALUE,
   });
 
-  const { sellerInput, sellerOutput } = await getSellerInputAndOutput(listing);
-
-  psbt.addInput(sellerInput);
-  psbt.addOutput(sellerOutput);
 
   // Add payment utxo inputs
   console.log(listing.buyer, " buyer payment utxos");
@@ -334,6 +333,9 @@ async function generateUnsignedBuyingPSBTBase64(listing: any, wallet: string) {
     // Accumulate total input value
     totalInput += utxo.value;
   }
+
+  psbt.addInput(sellerInput);
+  psbt.addOutput(sellerOutput);
 
   const fee = calculateTxFee(
     psbt.txInputs.length,

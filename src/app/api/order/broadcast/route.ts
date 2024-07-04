@@ -44,24 +44,27 @@ export async function POST(
 
     let doc: any = null;
 
+    console.log({parsedPsbt: parsedPsbt.data.inputs[1]})
+
     if (
-      parsedPsbt.data.inputs.length >= 4 &&
-      parsedPsbt.data.inputs[2].nonWitnessUtxo
+      parsedPsbt.data.inputs[1].nonWitnessUtxo
     ) {
       let sellerPublicKey: string | null = null;
-      if (parsedPsbt.data.inputs[2].tapInternalKey)
-        sellerPublicKey = fromXOnly(parsedPsbt.data.inputs[2].tapInternalKey);
-      const inscriptionNWO = parsedPsbt.data.inputs[2].nonWitnessUtxo;
+      if (parsedPsbt.data.inputs[1].tapInternalKey)
+        sellerPublicKey = fromXOnly(parsedPsbt.data.inputs[1].tapInternalKey);
+      const inscriptionNWO = parsedPsbt.data.inputs[1].nonWitnessUtxo;
       const deserializedTx = bitcoin.Transaction.fromBuffer(inscriptionNWO);
       const txid = deserializedTx.getId();
       const outputs = deserializedTx.outs.map((item, idx) => {
         return `${txid}:${idx}`;
       });
 
+      console.log({outputs})
+
       // Query the ListingModel
       const listings = await RuneUtxo.find({
         listed: true,
-        output: { $in: outputs },
+        utxo_id: { $in: outputs },
       });
 
       doc = listings[0];
@@ -75,6 +78,7 @@ export async function POST(
           { status: 404 }
         );
 
+        console.log("merging...")
       const mergedPsbtBase64 = mergeSignedBuyingPSBTBase64(
         doc.signed_psbt,
         signed_psbt

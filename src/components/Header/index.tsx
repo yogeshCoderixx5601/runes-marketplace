@@ -73,6 +73,7 @@ const Header = () => {
     addUserDetails();
   }, [walletDetails]);
 
+  console.log(walletDetails,"----------wallet details")
   const addURunesDetails = async () => {
     try {
       if (walletDetails && walletDetails.wallet && walletDetails.connected) {

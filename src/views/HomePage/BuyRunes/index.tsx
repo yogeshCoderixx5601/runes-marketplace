@@ -14,7 +14,7 @@ interface Props {
   runes: IBuyRunes[];
 }
 
-const SellRunePage: React.FC<Props> = ({ runes }) => {
+const BuyRunePage: React.FC<Props> = ({ runes }) => {
   const walletDetails = useWalletAddress();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -38,7 +38,7 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
   );
 // console.log(unsignedPsbtBase64,"---------------unsignedPsbtBase6467888")
   const handleBuyRunes = async (rune: IBuyRunes) => {
-    console.log(rune, "--------------handle buy rune");
+    // console.log(rune, "--------------handle buy rune");
     // if (
     //   !walletDetails ||
     //   !walletDetails.cardinal_address ||
@@ -69,28 +69,33 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
       [rune._id]: null, // Clear any previous error for specific rune
     }));
     const runeData = rune;
-    console.log(runeData, "---------rune data");
+    // console.log(runeData, "---------rune data");
     setRuneData(runeData);
 
     try {
       const response = await buyRunes({
         utxo_id: rune.utxo_id,
-        publickey: walletDetails?.ordinal_pubkey,
+        publickey: walletDetails?.cardinal_pubkey,
         pay_address: walletDetails?.cardinal_address,
         receive_address: walletDetails?.ordinal_address,
         wallet: walletDetails?.wallet,
         fee_rate: 20,
         price: rune.listed_price,
       });
-      console.log(
-        response?.data?.result.unsigned_psbt_base64,
-        "----------------response buy button"
-      );
-      // setRune(response?.data?.result)
-      setUnsignedPsbtBase64(response?.data?.result.unsigned_psbt_base64 || "");
+      if(response?.data?.result){
+        console.log(
+          response?.data?.result.unsigned_psbt_base64,
+          "----------------response buy button"
+        );
+        // setRune(response?.data?.result)
+        setAction("buy")
+        setInputLength(response?.data?.result.input_length)
+        setUnsignedPsbtBase64(response?.data?.result.unsigned_psbt_base64 || "");
+       
+      }
       // Handle response data if needed
     } catch (error:any) {
-      console.log("error:", error);
+      // console.log("error:", error);
       setErrorMap((prevErrorMap) => ({
         ...prevErrorMap,
         [rune._id]: error.message || "An error occurred", // Set error message for specific rune
@@ -116,16 +121,18 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
       return;
     }
     let inputs = [];
+    console.log({action})
     if (action === "dummy") {
       inputs.push({
         address: walletDetails.cardinal_address,
         publickey: walletDetails.cardinal_pubkey,
-        sighash: 1,
+        sighash: 131,
         index: [0],
       });
     } else if (action === "buy") {
+      console.log({inputLength})
       new Array(inputLength).fill(1).map((item: number, idx: number) => {
-        if (idx !== 2)
+        if (idx !== 1)
           inputs.push({
             address: walletDetails.cardinal_address,
             publickey: walletDetails.cardinal_pubkey,
@@ -200,6 +207,7 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
       );
     }
   };
+
   useEffect(() => {
     // Handling Wallet Sign Results/Errors
     if (result) {
@@ -239,7 +247,7 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
     setLoading(false);
   }, [result, error]);
 
-  console.log(runeData, "-----------runeData");
+  // console.log(runeData, "-----------runeData");
 
   return (
     <div className="w-full flex flex-wrap gap-4">
@@ -249,6 +257,7 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
           key={rune._id}
         >
           <div className="flex flex-col justify-center items-center ">
+          <p> {rune.runes[0].name}</p>
             <p>
               listed price: {convertSatoshiToBTC(rune.listed_price).toFixed(4)}{" "}
               BTC
@@ -258,7 +267,7 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
               {convertSatoshiToUSD(rune.listed_price, BtcPrice).toFixed(2)} USD
             </p>
             {/* <p> {rune.runes[0].amount}</p> */}
-            <p> {rune.runes[0].name}</p>
+            
           </div>
           <div className="flex w-full">
             <button
@@ -278,4 +287,4 @@ const SellRunePage: React.FC<Props> = ({ runes }) => {
   );
 };
 
-export default SellRunePage;
+export default BuyRunePage;

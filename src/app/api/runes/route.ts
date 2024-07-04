@@ -7,12 +7,14 @@ import { aggregateRuneAmounts, getRunes } from "@/utils/Runes";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+  console.log("************post runes to db for user and store utxos api called *************")
   try {
     const walletDetails = await req.json();
     console.log(walletDetails, "wallet details");
 
     const runesUtxos = await getRunes(walletDetails.ordinal_address);
 
+    console.log(runesUtxos,"rune Utxos")
     const aggregateRuneAmount = aggregateRuneAmounts(runesUtxos);
 
     await dbConnect();

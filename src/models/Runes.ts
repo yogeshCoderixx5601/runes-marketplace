@@ -24,7 +24,7 @@ const statusSchema = new Schema({
 const utxoSchema = new Schema({
   txid: { type: String, required: true },
   vout: { type: Number, required: true },
-  utxo_id: { type: String, required: true },
+  utxo_id: { type: String, required: true }, //, unique: true
   address: { type: String, required: true },
   status: { type: statusSchema, required: true },
   value: { type: Number, required: true },

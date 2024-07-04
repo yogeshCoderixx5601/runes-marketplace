@@ -68,7 +68,7 @@ export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
       },
     });
     
-    console.log(typeof response.data)
+    console.log( response.data, "RUNES RESPONSE FROM ORD SERVER")
     if (Array.isArray(response.data.runes) && response.data.runes.length > 0) {
       console.log("Runes data found:", response.data.runes);
       return response.data.runes;
