@@ -33,7 +33,7 @@ export async function getUtxosByAddress(address: string): Promise<AddressTxsUtxo
 
 export async function selectRunesUTXOs(utxos: AddressTxsUtxo[],payment_address: string): Promise<AddressTxsUtxo[]> {
   const selectedUtxos: any = [];
-  // console.log(payment_address,"---------------payment_address")
+  console.log(payment_address,"---------------payment_address")
   // Sort descending by value, and filter out dummy UTXOs
   utxos = utxos.sort((a, b) => b.value - a.value);
   
@@ -49,6 +49,9 @@ export async function selectRunesUTXOs(utxos: AddressTxsUtxo[],payment_address: 
 
   return selectedUtxos;
 }
+
+
+
 
 
 export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
@@ -69,12 +72,14 @@ export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
       },
     });
     
-    // console.log( response.data, "RUNES RESPONSE FROM ORD SERVER")
-    if (Array.isArray(response.data.runes) && response.data.runes.length > 0) {
+    console.log( response.data.runes, "RUNES RESPONSE FROM ORD SERVER")
+    const runeEntries = Object.entries(response.data.runes)
+    console.log(runeEntries,"-------runeEntries")
+    if ( runeEntries.length > 0) {
       console.log("Runes data found:", response.data.runes);
       return response.data.runes;
     } else {
-      // console.log("No runes data found or it is empty.");
+      console.log("No runes data found or it is empty.");
       return false;
     }
   } catch (error) {
@@ -83,21 +88,16 @@ export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
   }
 }
 
-
-
 export const extractNameAndAmount = (rune: AddressTxsUtxo | null | undefined) => {
-  // console.log(rune,"---------extractNameAndAmount")
   if (!rune) {
     return []; // Return an empty array if rune is null or undefined
   }
   
   const entries = Object.entries(rune);
-  // console.log(entries,"-----------entries")
   const result = entries.map(([name, details]) => ({
     name,
     amount: details.amount
   }));
-  // console.log(result,"-----------result")
   
   return result;
 };
@@ -109,7 +109,6 @@ export const aggregateRuneAmounts = (runesUtxos: AddressTxsUtxo[]) => {
     const rune = runesUtxo.rune; // Assuming runesUtxo is an AddressTxsUtxo object
     // console.log(rune,"------------rune in uaggreate Rune amount")
     const runeDetails = extractNameAndAmount(rune);
-    // console.log(runeDetails,"------------extract NameAndAmount")
 
     for (const { name, amount } of runeDetails) {
       if (runeMap.has(name)) {
@@ -125,18 +124,6 @@ export const aggregateRuneAmounts = (runesUtxos: AddressTxsUtxo[]) => {
   
   return result;
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -167,64 +154,3 @@ export const aggregateRuneAmounts = (runesUtxos: AddressTxsUtxo[]) => {
 
 // const mempoolNetwork = () =>
 //   process.env.NEXT_PUBLIC_NETWORK === "mainnet" ? "" : "testnet/";
-
-// export async function doesUtxoContainRunes(utxo: AddressTxsUtxo): Promise<any> {
-//   console.log("**********doescontain runes**********")
-//   try {
-//     // Determine API URL based on environment
-//     const apiUrl = process.env.NEXT_PUBLIC_NETWORK?.includes("testnet")
-//       ? "http://192.168.1.17:8080/"
-//       : `${process.env.NEXT_PUBLIC_PROVIDER}/`;
-    
-//     if (!apiUrl) {
-//       console.warn("API provider URL is not defined in environment variables");
-//       return undefined;
-//     }
-
-//     // Construct URL for the specific UTXO
-//     const url = `${apiUrl}output/${utxo.txid}:${utxo.vout}`;
-
-//     // Fetch UTXO data
-//     const response = await axios.get(url, {
-//       headers: {
-//         Accept: "application/json",
-//       },
-//     });
-
-//     // Check response status and data format
-//     if (response.status !== 200) {
-//       console.log(`Unexpected response status: ${response.status}`);
-//       return false;
-//     }
-
-//     // Check if 'runes' property exists
-//     if (response.data.hasOwnProperty('runes')) {
-//       let runesData = response.data.runes;
-
-//       // Ensure runesData is an array
-//       if (!Array.isArray(runesData)) {
-//         runesData = [runesData]; // Convert to array if it's not already
-//       }
-
-//       // Filter out empty objects from runesData
-//       const validRunes = runesData.filter((rune:any) => Object.keys(rune).length > 0);
-
-//       if (validRunes.length > 0) {
-//         console.log("Valid runes data found:", validRunes);
-//         // Store or process the validRunes data in your database
-//         // Example: await storeRunesInDatabase(validRunes);
-//         return validRunes;
-//       } else {
-//         console.log("No valid runes data found.");
-//         return false;
-//       }
-//     } else {
-//       console.log("No 'runes' field found in response.");
-//       return false;
-//     }
-//   } catch (error) {
-//     console.error("Error in doesUtxoContainRunes:", error);
-//     // Return undefined or handle error based on requirements
-//     return false;
-//   }
-// }
