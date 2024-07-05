@@ -26,6 +26,7 @@ function validateRequest(body: OrderInput): string[] {
     "fee_rate",
     "price", // listed price
   ];
+
   const missingFields = requiredFields.filter((field) => {
     //@ts-ignore
     const value = body[field];
@@ -51,7 +52,7 @@ async function processOrdItem(
   expected_price: number
 ) {
   const ordItem: any = await fetchLatestUtxoData(utxo_id);
-  console.log(ordItem,"---order items")
+  // console.log(ordItem,"---order items")
   await dbConnect();
   const dbItem: any | null = await RuneUtxo.findOne({
     utxo_id,
@@ -59,7 +60,7 @@ async function processOrdItem(
   });
     // .populate("official_collection");
 
-  console.log("got db listing");
+  // console.log("got db listing");
 
   if (!dbItem || !dbItem.address) {
     throw Error("Item not listed in db");
@@ -81,7 +82,7 @@ async function processOrdItem(
     throw Error("PSBT Expired");
   }
   if (dbItem.listed_price !== expected_price) {
-    console.log({ price: dbItem.listed_price, expected_price });
+    // console.log({ price: dbItem.listed_price, expected_price });
     throw Error("Item Price has been updated. Refresh Page.");
   }
   if (
@@ -124,7 +125,7 @@ export async function POST(
 
   try {
     const body: any = await req.json();
-    console.log(body)
+    // console.log(body)
     const missingFields = validateRequest(body);
 
     if (missingFields.length > 0) {
@@ -146,7 +147,7 @@ export async function POST(
       body.fee_rate,
       body.price
     );
-    console.log(result, "process order items result")
+    // console.log(result, "process order items result")
 
     //buy psbt || dummy utxo psbt
     const psbt = result.data.psbt.buyer

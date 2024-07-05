@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { setNewActivity } from "@/stores/reducers/generalReducer";
 import { IBuyRunes } from "@/types";
+import mempoolJS from "@mempool/mempool.js";
 
 interface Props {
   runes: IBuyRunes[];
@@ -28,7 +29,7 @@ const BuyRunePage: React.FC<Props> = ({ runes }) => {
     {}
   );
   const [loading, setLoading] = useState(false);
-  // const [feeRate, setFeeRate] = useState(0);
+  const [feeRate, setFeeRate] = useState(0);
   // const [defaultFeeRate, setDefaultFeerate] = useState(0);
   const BtcPrice = useSelector(
     (state: RootState) => state.general.btc_price_in_dollar
@@ -36,8 +37,32 @@ const BuyRunePage: React.FC<Props> = ({ runes }) => {
   const balanceData = useSelector(
     (state: RootState) => state.general.balanceData
   );
+
+  const fee = async () => {
+  
+    const { bitcoin: { fees } } = mempoolJS({
+      hostname: 'mempool.space',
+      network: 'testnet'
+    });
+  
+    const feesRecommended = await fees.getFeesRecommended();
+    setFeeRate(feesRecommended.fastestFee +10)
+    console.log(feesRecommended);
+            
+  };
+  
+
+  useEffect(()=> {
+    fee()
+  },[])
+
+  console.log(feeRate,"-----fee rate")
+  
+ 
+  
 // console.log(unsignedPsbtBase64,"---------------unsignedPsbtBase6467888")
   const handleBuyRunes = async (rune: IBuyRunes) => {
+  
     // console.log(rune, "--------------handle buy rune");
     // if (
     //   !walletDetails ||
@@ -79,7 +104,7 @@ const BuyRunePage: React.FC<Props> = ({ runes }) => {
         pay_address: walletDetails?.cardinal_address,
         receive_address: walletDetails?.ordinal_address,
         wallet: walletDetails?.wallet,
-        fee_rate: 20,
+        fee_rate: feeRate,
         price: rune.listed_price,
       });
       if(response?.data?.result){
@@ -247,7 +272,7 @@ const BuyRunePage: React.FC<Props> = ({ runes }) => {
     setLoading(false);
   }, [result, error]);
 
-  // console.log(runeData, "-----------runeData");
+
 
   return (
     <div className="w-full flex flex-wrap gap-4">

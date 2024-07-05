@@ -132,13 +132,15 @@ export async function POST(
       cardinal_address: user_address,
     });
     console.log({ user });
+    console.log(doc,"-----------------------docs before update false")
     if (txid) {
       if (doc) {
         await RuneUtxo.findByIdAndUpdate(doc._id, {
-          listed: true,
-          in_mempool: true,
+          listed: false,
+          // in_mempool: true,
           txid,
         });
+
         console.log(RuneUtxo, "updated runes utxo");
         // let btcPrice = 0;
 

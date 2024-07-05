@@ -10,10 +10,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  //customAuthOptions={{network:"testnet"}}
+  //
   return (
     <Provider store={store}>
-      <WalletProvider >
+      <WalletProvider customAuthOptions={{network:"testnet"}}>
         <html lang="en">
           <body className="bg-primary text-light_gray relative ">
             <main className="  no-scrollbar relative pb-16 lg:pb-24">

@@ -16,7 +16,7 @@ export async function getTxHexById(txId: TxId): Promise<string> {
         : `https://mempool-api.ordinalnovus.com/tx/${txId}/hex`;
     txHexByIdCache[txId] = await fetch(url).then((response) => response.text());
   }
-  console.log(txHexByIdCache[txId], "----------txHexByIdCache[txId]");
+  // console.log(txHexByIdCache[txId], "----------txHexByIdCache[txId]");
   return txHexByIdCache[txId];
 }
 
@@ -29,21 +29,21 @@ export function getSellerOrdOutputValue(
   prevUtxoValue: number
 ): number {
   if (makerFeeBp === undefined || makerFeeBp === null) {
-    console.log(
-      "makerFeeBp was undefined or null, setting to default 100 basis points"
-    );
+    // console.log(
+    //   "makerFeeBp was undefined or null, setting to default 100 basis points"
+    // );
     makerFeeBp = 100; // if makerFeeBp is undefined or null, set it to 100 basis points (1%)
   }
-  console.log("makerFeeBp: ", makerFeeBp);
+  // console.log("makerFeeBp: ", makerFeeBp);
 
   const makerFeePercent = makerFeeBp / 10000; // converting basis points to percentage
-  console.log("makerFeePercent: ", makerFeePercent);
+  // console.log("makerFeePercent: ", makerFeePercent);
 
   const makerFee = Math.floor(price * makerFeePercent);
-  console.log("Maker's fee: ", makerFee);
+  // console.log("Maker's fee: ", makerFee);
 
   const outputValue = price - makerFee + prevUtxoValue;
-  console.log("Output Value: ", outputValue);
+  // console.log("Output Value: ", outputValue);
 
   return Math.floor(outputValue);
 }
@@ -62,11 +62,11 @@ export function validatePsbt(signedPsbt: string) {
       currentPsbt = bitcoin.Psbt.fromBase64(signedPsbt);
     }
 
-    console.log(currentPsbt, "CPSBT");
-    console.log(
-      currentPsbt.validateSignaturesOfInput(0, schnorrValidator),
-      "CURRENTPSBT"
-    );
+    // // console.log(currentPsbt, "CPSBT");
+    // console.log(
+    //   currentPsbt.validateSignaturesOfInput(0, schnorrValidator),
+    //   "CURRENTPSBT"
+    // );
 
     const validator = currentPsbt.data.inputs[0].tapInternalKey
       ? schnorrValidator
@@ -114,15 +114,15 @@ export async function mapUtxos(utxosFromMempool: any[]): Promise<UTXO[]> {
 
 export async function fetchLatestUtxoData(utxo_id: string): Promise<any> {
   const url = `${process.env.NEXT_PUBLIC_PROVIDER}/output/${utxo_id}`;
-  console.log("**************url:", url);
+  // console.log("**************url:", url);
   try {
-    console.log("------------before response");
+    // console.log("------------before response");
     const response = await axios.get(url, {
       headers: {
         Accept: "application/json",
       },
     });
-    console.log(response, "------------response");
+    // console.log(response, "------------response");
     const data = response.data;
     return data;
   } catch (error:any) {

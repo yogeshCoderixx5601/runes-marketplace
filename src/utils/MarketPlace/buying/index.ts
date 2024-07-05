@@ -35,10 +35,10 @@ export async function buyOrdinalPSBT(
   let dummyUtxos: UTXO[] | null;
   let paymentUtxos: AddressTxsUtxo[] | undefined;
 
-   console.log({payerAddress})
+  //  console.log({payerAddress})
   try {
     payerUtxos = await getUtxosByAddress(payerAddress);
-    console.log(payerUtxos, "---------payerUtxos");
+    console.log(payerUtxos.length, "---------payerUtxos");
   } catch (e) {
     // console.error(e);
     return Promise.reject("Mempool error");
@@ -81,7 +81,7 @@ export async function buyOrdinalPSBT(
       fee_rate,
       taprootAddress
     );
-    console.log(paymentUtxos, "-----------rune utxos");
+    console.log(paymentUtxos?.length, "-----------rune utxos");
 
     let psbt: any = null;
 
@@ -114,7 +114,7 @@ export async function buyOrdinalPSBT(
           buyerPaymentUTXOs: paymentUtxos,
         },
       };
-      console.log("Generating payment PSBT");
+      // console.log("Generating payment PSBT");
       // console.log({ listing });
 
       psbt = await generateUnsignedBuyingPSBTBase64(listing, wallet);
@@ -273,12 +273,13 @@ async function generateUnsignedBuyingPSBTBase64(listing: any, wallet: string) {
     value: ORDINALS_POSTAGE_VALUE,
   });
 
+  const latestBuyerInput = []
 
   // Add payment utxo inputs
-  console.log(listing.buyer, " buyer payment utxos");
+  // console.log(listing.buyer, " buyer payment utxos");
   for (const utxo of listing.buyer.buyerPaymentUTXOs) {
     const tx = bitcoin.Transaction.fromHex(await getTxHexById(utxo.txid));
-    console.log(tx, "-------------tx");
+    // console.log(tx, "-------------tx");
 
     // Loop through outputs of the transaction
     for (const output in tx.outs) {
@@ -327,8 +328,15 @@ async function generateUnsignedBuyingPSBTBase64(listing: any, wallet: string) {
       );
     }
 
+
+
+    if(!totalInput){
     // Add input to PSBT
     psbt.addInput(input);
+    }
+    else{
+      latestBuyerInput.push(input)
+    }
 
     // Accumulate total input value
     totalInput += utxo.value;
@@ -336,6 +344,12 @@ async function generateUnsignedBuyingPSBTBase64(listing: any, wallet: string) {
 
   psbt.addInput(sellerInput);
   psbt.addOutput(sellerOutput);
+
+  if(latestBuyerInput.length > 0){
+    for(const input of latestBuyerInput){
+      psbt.addInput(input)
+    }
+  }
 
   const fee = calculateTxFee(
     psbt.txInputs.length,
@@ -408,7 +422,7 @@ async function getSellerInputAndOutput(listing: any) {
     sellerInput.tapInternalKey = toXOnly(
       tx.toBuffer().constructor(listing.seller.tapInternalKey, "hex")
     );
-    console.log(sellerInput.tapInternalKey.toString("hex"), "tik");
+    // console.log(sellerInput.tapInternalKey.toString("hex"), "tik");
   }
   if (!listing.seller.ordItem.value) {
     throw Error("Inscription has no output value");
@@ -433,17 +447,17 @@ export function mergeSignedBuyingPSBTBase64(
   signedListingPSBTBase64: string,
   signedBuyingPSBTBase64: string
 ): string {
-  console.log("[INFO] Initiating merging of signed PSBTs.");
+  // console.log("[INFO] Initiating merging of signed PSBTs.");
 
   // Deserialize PSBTs from Base64
-  console.log("[INFO] Deserializing seller PSBTs from Base64.");
+  // console.log("[INFO] Deserializing seller PSBTs from Base64.");
   const sellerSignedPsbt = bitcoin.Psbt.fromBase64(signedListingPSBTBase64);
 
-  console.log("[INFO] Deserializing buyer PSBTs from Base64.");
+  // console.log("[INFO] Deserializing buyer PSBTs from Base64.");
   const buyerSignedPsbt = bitcoin.Psbt.fromBase64(signedBuyingPSBTBase64);
 
   // Merge operations
-  console.log("[INFO] Merging seller's signature into buyer's PSBT.");
+  // console.log("[INFO] Merging seller's signature into buyer's PSBT.");
 
   (buyerSignedPsbt.data.globalMap.unsignedTx as any).tx.ins[
     BUYING_PSBT_SELLER_SIGNATURE_INDEX
@@ -452,9 +466,9 @@ export function mergeSignedBuyingPSBTBase64(
   buyerSignedPsbt.data.inputs[BUYING_PSBT_SELLER_SIGNATURE_INDEX] =
     sellerSignedPsbt.data.inputs[0];
 
-  console.log("[SUCCESS] Merging completed successfully.");
+  // console.log("[SUCCESS] Merging completed successfully.");
 
   // Return serialized PSBT
-  console.log("[INFO] Serializing merged PSBT to Base64.");
+  // console.log("[INFO] Serializing merged PSBT to Base64.");
   return buyerSignedPsbt.toBase64();
 }

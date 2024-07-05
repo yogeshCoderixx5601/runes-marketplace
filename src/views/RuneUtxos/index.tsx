@@ -223,12 +223,16 @@ const RuneUtxos = ({ rune }: { rune: string }) => {
           </div>
           {!unsignedPsbtBase64 ? (
             <div className="w-1/4 flex justify-center mt-4">
-              <button
+             {!unsignedPsbtBase64 ?  <button
                 onClick={() => handleList(utxoIndex)}
                 className="custom-gradient text-white font-bold py-2 px-4 rounded cursor-pointer flex justify-center"
               >
                 List Now
-              </button>
+              </button> : ( <button
+                className="custom-gradient text-white font-bold py-2 px-4 rounded cursor-pointer flex justify-center"
+              >
+                Listed
+              </button>)}
             </div>
           ) : (
             <div className="w-1/4 flex justify-center mt-4">
